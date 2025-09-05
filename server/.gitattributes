@@ -1,0 +1,5 @@
+# enforce LF on all text files
+* text=auto eol=lf
+*.sh text eol=lf
+*.ts text eol=lf
+*.js text eol=lf
