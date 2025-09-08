@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: Partial<User>) {
     return this.userModel.create(createUserDto);
   }
   async findAll() {
@@ -21,5 +21,8 @@ export class UsersService {
   }
   async findByEmail(email: string) {
     return this.userModel.findOne({ email: email.trim().toLowerCase() }).exec();
+  }
+  async findByEmailVerificationToken(token: string) {
+    return this.userModel.findOne({ emailVerificationToken: token });
   }
 }

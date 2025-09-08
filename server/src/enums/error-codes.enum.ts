@@ -25,4 +25,6 @@ export enum ErrorCode {
   PRODUCT_OUT_OF_STOCK = 'PRODUCT_OUT_OF_STOCK',
 
   // ... thêm theo domain của bạn
+  //Switch
+  SWITCH_NOT_FOUND = 'SWITCH_NOT_FOUND',
 }

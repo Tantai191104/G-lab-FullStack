@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { envValidationSchema } from './config/validation';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { SwitchesModule } from './modules/switches/switches.module';
+import { KeycapsModule } from './modules/keycaps/keycaps.module';
 @Module({
   imports: [
     // Load biến môi trường toàn cục, validate bằng Joi
@@ -28,6 +29,10 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
 
     AuthModule,
+
+    SwitchesModule,
+
+    KeycapsModule,
   ],
 })
 export class AppModule {}

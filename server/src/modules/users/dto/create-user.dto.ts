@@ -3,10 +3,9 @@ import {
   IsString,
   MinLength,
   MaxLength,
-  Matches,
   IsArray,
-  ArrayNotEmpty,
   IsNotEmpty,
+  ArrayMinSize,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -18,9 +17,6 @@ export class CreateUserDto {
   @IsString()
   @MinLength(8)
   @MaxLength(50)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/, {
-    message: 'Password too weak',
-  })
   password: string;
 
   @IsString()
@@ -29,7 +25,7 @@ export class CreateUserDto {
   name: string;
 
   @IsArray()
-  @ArrayNotEmpty()
+  @ArrayMinSize(1)
   @IsString({ each: true })
   address: string[];
 }

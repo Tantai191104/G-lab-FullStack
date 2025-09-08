@@ -5,6 +5,7 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { ValidationError } from 'class-validator';
 import { ValidationException } from './common/exceptions/validation.exception';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -28,7 +29,7 @@ async function bootstrap() {
   );
   // Exception filter
   app.useGlobalFilters(new AllExceptionsFilter());
-
+  app.use(cookieParser());
   // Response interceptor
   app.useGlobalInterceptors(new ResponseInterceptor());
   await app.listen(process.env.PORT ?? 3000);

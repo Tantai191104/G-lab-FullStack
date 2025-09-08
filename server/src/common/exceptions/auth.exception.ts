@@ -19,3 +19,9 @@ export class InvalidCredentialsException extends BaseHttpException {
     super(ErrorCode.UNAUTHORIZED, 'Email or password is incorrect', HttpStatus.UNAUTHORIZED);
   }
 }
+
+export class EmailNotVerifiedException extends BaseHttpException {
+  constructor() {
+    super(ErrorCode.UNAUTHORIZED, 'Email not verified', HttpStatus.UNAUTHORIZED);
+  }
+}
