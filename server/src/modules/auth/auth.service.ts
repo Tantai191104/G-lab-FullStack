@@ -80,8 +80,7 @@ export class AuthService {
     await this.mailService.sendVerificationEmail(user.email, emailToken);
 
     return {
-      message: 'User created. Please verify your email before login.',
-      user: { id: user._id, email: user.email },
+      message: `Đăng ký thành công . Vui lòng xác thực email ${user.email} trước khi đăng nhập.`,
     };
   }
 
@@ -111,6 +110,7 @@ export class AuthService {
     const result = user.toObject();
     result.password = '';
     delete result.refreshToken;
+    result.address = [];
 
     return {
       user: result,

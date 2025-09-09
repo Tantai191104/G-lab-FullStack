@@ -16,12 +16,12 @@ export class EmailAlreadyExistsException extends BaseHttpException {
 
 export class InvalidCredentialsException extends BaseHttpException {
   constructor() {
-    super(ErrorCode.UNAUTHORIZED, 'Email or password is incorrect', HttpStatus.UNAUTHORIZED);
+    super(ErrorCode.BAD_REQUEST, 'Email or password is incorrect', HttpStatus.BAD_REQUEST);
   }
 }
 
 export class EmailNotVerifiedException extends BaseHttpException {
   constructor() {
-    super(ErrorCode.UNAUTHORIZED, 'Email not verified', HttpStatus.UNAUTHORIZED);
+    super(ErrorCode.BAD_REQUEST, 'Email not verified', HttpStatus.BAD_REQUEST);
   }
 }
