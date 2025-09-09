@@ -22,19 +22,22 @@ export default function HomePage() {
         categories={[
           {
             name: "Kit",
-            image: "https://i.pinimg.com/736x/2d/88/1d/2d881d59f26b8559928de0407d956ca5.jpg",
+            image:
+              "https://i.pinimg.com/736x/2d/88/1d/2d881d59f26b8559928de0407d956ca5.jpg",
           },
           {
             name: "Keycaps",
-            image: "https://i.pinimg.com/736x/ee/10/ac/ee10ac7d58a37c3228ae33985f9db1ad.jpg",
+            image:
+              "https://i.pinimg.com/736x/ee/10/ac/ee10ac7d58a37c3228ae33985f9db1ad.jpg",
           },
-          { 
-            name: "Switchs", 
-            image: "data:image/jpeg;base64,/9j/4AAQ..." 
+          {
+            name: "Switchs",
+            image: "data:image/jpeg;base64,/9j/4AAQ...",
           },
           {
             name: "Custom",
-            image: "https://www.phongcachxanh.vn/cdn/shop/files/wlmouse-ying75-8k-ban-phim-he-75-forged-carbon-rapid-trigger-0-005mm-1184728828.jpg?v=1755320979&width=800",
+            image:
+              "https://www.phongcachxanh.vn/cdn/shop/files/wlmouse-ying75-8k-ban-phim-he-75-forged-carbon-rapid-trigger-0-005mm-1184728828.jpg?v=1755320979&width=800",
           },
         ]}
       />

@@ -87,7 +87,7 @@ export default function ContactForm() {
         },
       }}
     >
-      <div className="w-full max-w-7xl mx-auto my-20 px-6">
+      <div className="w-full max-w-7xl mx-auto my-20 px-6" id="contact">
         {/* Main container với background đẹp */}
         <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-3xl p-8 md:p-12 shadow-2xl overflow-hidden">
           {/* Background decorative elements */}
