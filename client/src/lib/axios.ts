@@ -1,6 +1,6 @@
 import { useAuthStore } from "@/store/auth";
 import axios, { type AxiosRequestConfig, type AxiosError } from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -33,8 +33,11 @@ API.interceptors.request.use((config) => {
 // ----------------------
 API.interceptors.response.use(
   (response) => {
-    if (response?.data?.message) {
-      toast.success(response.data.message);
+    // Trường hợp message nằm trong response.data.data.message
+    const message = response?.data?.message || response?.data?.data?.message;
+
+    if (message) {
+      toast.success(message);
     }
     return response;
   },

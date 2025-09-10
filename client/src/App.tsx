@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import HomePage from "./pages/Home/HomePage";
 import NotFoundPage from "./components/common/Error/NotFoundPage";
 import BaseLayout from "./layout/BaseLayout";
@@ -9,10 +8,11 @@ import AuthPage from "./pages/auth/AuthPage";
 import AuthLayout from "./layout/AuthLayout";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import VerifyEmailPage from "./pages/auth/VerifyEmailPage";
+import { Toaster } from "sonner";
 export default function App() {
   return (
     <>
-      <ToastContainer position="top-right" autoClose={3000} theme="dark" />
+      <Toaster position="top-right" theme="dark" />
       <BrowserRouter>
         <Routes>
           {/* Dùng chung layout */}

@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import { useKeyboardCustomizer } from "../../hooks/useKeyboardCustomizer";
 import { Modal, Spin, Tag } from "antd";
 import { HeaderBar } from "./HeaderBar";
@@ -13,22 +14,61 @@ import ExportDialog from "./ExportDialog";
 import Stepper from "./Stepper";
 import { ViewModeSelector } from "./ViewModeSelector";
 
+const MemoBalatro = React.memo(Balatro);
+
 export default function KeyboardCustomizerModern() {
   const customizer = useKeyboardCustomizer();
+
+  // Memo hóa props cho Balatro
+  const balatroProps = useMemo(
+    () => ({
+      isRotate: false,
+      mouseInteraction: true,
+      pixelFilter: 700,
+      color1: "#",
+      color2: "#FAE04E",
+      color3: "#15368B",
+    }),
+    []
+  );
+
+  const memoKeyboardToolbarProps = useMemo(
+    () => ({
+      viewMode: customizer.viewMode,
+      percentKeycaps: customizer.percentKeycaps,
+      percentSwitches: customizer.percentSwitches,
+      selectedKey: customizer.selectedKey,
+      selectedKeycapGroup: customizer.selectedKeycapGroup,
+      setSelectedKeycapGroup: customizer.setSelectedKeycapGroup,
+      selectedGroup: customizer.selectedGroup,
+      setSelectedGroup: customizer.setSelectedGroup,
+      baseGroups: customizer.baseGroups,
+      keyConfigs: customizer.keyConfigs,
+      setHighlightKeys: customizer.setHighlightKeys,
+      clearAll: customizer.clearAll,
+    }),
+    [
+      customizer.viewMode,
+      customizer.percentKeycaps,
+      customizer.percentSwitches,
+      customizer.selectedKey,
+      customizer.selectedKeycapGroup,
+      customizer.setSelectedKeycapGroup,
+      customizer.selectedGroup,
+      customizer.setSelectedGroup,
+      customizer.baseGroups,
+      customizer.keyConfigs,
+      customizer.setHighlightKeys,
+      customizer.clearAll,
+    ]
+  );
 
   return (
     <>
       <div className=" min-h-screen w-full md:p-6">
         {/* Background Balatro */}
         <div className="fixed inset-0 -z-20">
-          <Balatro
-            isRotate={false}
-            mouseInteraction={true}
-            pixelFilter={700}
-            color1="#"
-            color2="#FAE04E"
-            color3="#15368B"
-          />
+          <MemoBalatro {...balatroProps} />
         </div>
 
         {/* Header */}
@@ -70,20 +110,7 @@ export default function KeyboardCustomizerModern() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            <KeyboardToolbar
-              viewMode={customizer.viewMode}
-              percentKeycaps={customizer.percentKeycaps}
-              percentSwitches={customizer.percentSwitches}
-              selectedKey={customizer.selectedKey}
-              selectedKeycapGroup={customizer.selectedKeycapGroup}
-              setSelectedKeycapGroup={customizer.setSelectedKeycapGroup}
-              selectedGroup={customizer.selectedGroup}
-              setSelectedGroup={customizer.setSelectedGroup}
-              baseGroups={customizer.baseGroups}
-              keyConfigs={customizer.keyConfigs}
-              setHighlightKeys={customizer.setHighlightKeys}
-              clearAll={customizer.clearAll}
-            />
+            <KeyboardToolbar {...memoKeyboardToolbarProps} />
           </motion.div>
         </div>
 

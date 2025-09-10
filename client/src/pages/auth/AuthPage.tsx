@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { AnimatePresence, motion, cubicBezier } from "framer-motion";
 import { FiArrowLeft } from "react-icons/fi";
 import LoginForm from "./LoginForm";
@@ -67,7 +67,6 @@ const AuthPage: React.FC = () => {
       },
       {
         onSuccess: () => {
-          toast.success("Đăng ký thành công!");
           navigate("/auth/login");
         },
       }
