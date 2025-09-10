@@ -1,23 +1,11 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useKeyboardCustomizer } from "../../hooks/useKeyboardCustomizer";
 import { Modal, Spin, Tag } from "antd";
-import data from "../../data/keyboardData.json";
 import { HeaderBar } from "./HeaderBar";
 import { KeyboardFactory } from "./KeyboardDisplayFactory";
 import { ExportOutlined } from "@ant-design/icons";
-import { SelectedKey } from "./SelectedKey";
-import { QuickSelectGroup } from "./QuickSelectGroup";
 import { motion } from "framer-motion";
 import { PickerDrawer } from "./PickerDrawer";
-import { ActionToolbar } from "./ActionToolbar";
-import type {
-  ExportPayload,
-  KeyboardSize,
-  Keycap,
-  KeyConfig,
-  KeyGroups,
-  KeyObject,
-  SwitchItem,
-} from "../types/types";
+import { KeyboardToolbar } from "./KeyboardToolbar";
 import Balatro from "../react-bits/Backgrounds/Balatro/Balatro";
 import StartLayoutModal from "./StartLayoutModal";
 import KitDrawer from "./KitDrawer";
@@ -26,317 +14,22 @@ import Stepper from "./Stepper";
 import { ViewModeSelector } from "./ViewModeSelector";
 
 export default function KeyboardCustomizerModern() {
-  const {
-    keyWidths,
-    layouts,
-    switches: switchList,
-    keycaps,
-    kits,
-    switchColors,
-  } = data as unknown as {
-    keyWidths: Record<KeyboardSize, Record<string, number>>;
-    layouts: Record<string, KeyObject[][]>;
-    switches: SwitchItem[];
-    keycaps: Keycap[];
-    kits: { name: string; image: string; description?: string }[];
-    switchColors: Record<string, string>;
-  };
-  // ==== Memo Data Json ====
-  const memoKits = useMemo(() => kits, [kits]);
-  const memoKeyWidths = useMemo(() => keyWidths, [keyWidths]);
-  const memoLayouts = useMemo(() => layouts, [layouts]);
-  const memoSwitchList = useMemo(() => switchList, [switchList]);
-  const memoKeycaps = useMemo(() => keycaps, [keycaps]);
-  const memoSwitchColors = useMemo(() => switchColors, [switchColors]);
-  // ==== Derived groups ====
-  const baseGroups: KeyGroups = useMemo(
-    () => ({
-      numbers: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
-      letters: layouts.full
-        .flat()
-        .map((k) => k.key)
-        .filter((k) => /^[A-Z]$/i.test(k)),
-      arrows: ["Up", "Down", "Left", "Right"],
-    }),
-    [layouts.full]
-  );
-
-  // ==== States ====
-  const [keyboardSize, setKeyboardSize] = useState<KeyboardSize>("full");
-  const [viewMode, setViewMode] = useState<"keycap" | "switch">("keycap");
-
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
-  const [selectedGroup, setSelectedGroup] = useState<
-    keyof KeyGroups | "all" | null
-  >(null);
-  const [selectedKeycapGroup, setSelectedKeycapGroup] = useState<
-    keyof KeyGroups | "all" | null
-  >(null);
-
-  const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [selectedSwitch, setSelectedSwitch] = useState<string | null>(null);
-  const [selectedKit, setSelectedKit] = useState<string | null>(null);
-
-  const [keyConfigs, setKeyConfigs] = useState<KeyConfig[]>([]);
-  const [highlightKeys, setHighlightKeys] = useState<string[] | undefined>(
-    undefined
-  );
-  const [exportData, setExportData] = useState<ExportPayload | null>(null);
-
-  const [showModal, setShowModal] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [panelPickerOpen, setPanelPickerOpen] = useState(false);
-  // search
-  const [searchKeycap, setSearchKeycap] = useState("");
-  const [searchSwitch, setSearchSwitch] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showLayoutPopup, setShowLayoutPopup] = useState(true);
-
-  // ==== Keys for layout ====
-  const allKeysForSize = useMemo(
-    () => layouts[keyboardSize].flat().map((k) => k.key),
-    [keyboardSize, layouts]
-  );
-
-  const keyGroups: KeyGroups = useMemo(
-    () => ({
-      all: allKeysForSize,
-      ...baseGroups,
-    }),
-    [allKeysForSize, baseGroups]
-  );
-
-  useEffect(() => {
-    setKeyConfigs((prev) => {
-      const next: KeyConfig[] = allKeysForSize.map((key) => {
-        const found = prev.find((cfg) => cfg.key === key);
-        return found || { key };
-      });
-      return next;
-    });
-  }, [allKeysForSize]);
-  // ==== Actions ====
-  // Hàm apply chung cho keycap hoặc switch
-  const handleApplyToTargets = useCallback(
-    (value: Keycap | SwitchItem, type: "keycap" | "switch") => {
-      let targets: string[] = [];
-
-      if (highlightKeys?.length) {
-        targets = highlightKeys;
-      } else if (selectedKeycapGroup === "all" || selectedGroup === "all") {
-        targets = keyGroups.all;
-      } else if (selectedKeycapGroup && keyGroups[selectedKeycapGroup]) {
-        targets = keyGroups[selectedKeycapGroup];
-      } else if (selectedGroup && keyGroups[selectedGroup]) {
-        targets = keyGroups[selectedGroup];
-      } else if (selectedKey) {
-        targets = [selectedKey];
-      }
-
-      if (!targets.length) return;
-
-      setKeyConfigs((prev) =>
-        prev.map((cfg) =>
-          targets.includes(cfg.key)
-            ? type === "keycap"
-              ? { ...cfg, keycap: value as Keycap }
-              : { ...cfg, switch: value as SwitchItem }
-            : cfg
-        )
-      );
-    },
-    [
-      highlightKeys,
-      selectedKey,
-      selectedGroup,
-      selectedKeycapGroup,
-      keyGroups,
-      setKeyConfigs,
-    ]
-  );
-
-  // handle riêng cho keycap và switch dùng chung handleApplyToTargets
-  const handleKeycapChange = useCallback(
-    (keycapObj: Keycap) => handleApplyToTargets(keycapObj, "keycap"),
-    [handleApplyToTargets]
-  );
-
-  const handleSwitchClick = useCallback(
-    (switchObj: SwitchItem) => handleApplyToTargets(switchObj, "switch"),
-    [handleApplyToTargets]
-  );
-
-  const clearAll = useCallback(() => {
-    setKeyConfigs(allKeysForSize.map((key) => ({ key })));
-    setSelectedKey(null);
-    setSelectedGroup(null);
-    setSelectedKeycapGroup(null);
-    setSelectedSwitch(null);
-  }, [
-    allKeysForSize,
-    setKeyConfigs,
-    setSelectedKey,
-    setSelectedGroup,
-    setSelectedKeycapGroup,
-    setSelectedSwitch,
-  ]);
-
-  const handleExport = useCallback(() => {
-    const missingKeycaps = keyConfigs
-      .filter((cfg) => !cfg.keycap)
-      .map((cfg) => cfg.key);
-    const missingSwitches = keyConfigs
-      .filter((cfg) => !cfg.switch)
-      .map((cfg) => cfg.key);
-
-    // Kiểm tra thiếu kit
-    const missingKit = !selectedKit;
-
-    if (missingKeycaps.length || missingSwitches.length || missingKit) {
-      Modal.warning({
-        title: "Thiếu thông tin xuất cấu hình",
-        content: (
-          <div className="space-y-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-md">
-            {missingKit && (
-              <p className="text-yellow-800">
-                <strong>Chưa chọn bộ kit.</strong>
-              </p>
-            )}
-            {missingKeycaps.length > 0 && (
-              <p className="text-yellow-800">
-                <strong>Chưa chọn keycap cho các phím:</strong>{" "}
-                {missingKeycaps.map((k) => (
-                  <Tag key={k} color="gold" className="mb-1">
-                    {k}
-                  </Tag>
-                ))}
-              </p>
-            )}
-            {missingSwitches.length > 0 && (
-              <p className="text-red-800">
-                <strong>Chưa chọn switch cho các phím:</strong>{" "}
-                {missingSwitches.map((k) => (
-                  <Tag key={k} color="red" className="mb-1">
-                    {k}
-                  </Tag>
-                ))}
-              </p>
-            )}
-          </div>
-        ),
-      });
-      return;
-    }
-
-    setExportData({
-      layout: keyboardSize,
-      kit: selectedKit,
-      keyConfigs,
-    });
-    setShowModal(true);
-  }, [keyConfigs, keyboardSize, selectedKit, setExportData, setShowModal]);
-
-  const handleLayoutSelect = (size: "60" | "80" | "full") => {
-    setKeyboardSize(size);
-    setShowLayoutPopup(false); // đóng popup sau khi chọn
-  };
-
-  const handleSelectKit = useCallback((kitName: string) => {
-    setSelectedKit(kitName);
-  }, []);
-
-  // ==== Filters ====
-  const [debouncedSearchKeycap, setDebouncedSearchKeycap] =
-    useState(searchKeycap);
-  useEffect(() => {
-    const handler = setTimeout(
-      () => setDebouncedSearchKeycap(searchKeycap),
-      300
-    ); // 300ms debounce
-    return () => clearTimeout(handler);
-  }, [searchKeycap]);
-
-  const filteredKeycaps = useMemo(() => {
-    const q = debouncedSearchKeycap.trim().toLowerCase();
-    return q
-      ? keycaps.filter((c) => c.name.toLowerCase().includes(q))
-      : keycaps;
-  }, [debouncedSearchKeycap, keycaps]);
-
-  // Debounced value của searchSwitch
-  const [debouncedSearchSwitch, setDebouncedSearchSwitch] =
-    useState(searchSwitch);
-  useEffect(() => {
-    const handler = setTimeout(
-      () => setDebouncedSearchSwitch(searchSwitch),
-      300
-    );
-    return () => clearTimeout(handler);
-  }, [searchSwitch]);
-
-  const filteredSwitches = useMemo(() => {
-    const q = debouncedSearchSwitch.trim().toLowerCase();
-    const list = q
-      ? switchList.filter((s) => s.name.toLowerCase().includes(q))
-      : switchList;
-    return list.filter((sw) => !selectedType || sw.type === selectedType);
-  }, [debouncedSearchSwitch, selectedType, switchList]);
-
-  const totalKeys = allKeysForSize.length;
-  const percentKeycaps = useMemo(
-    () =>
-      Math.round(
-        (keyConfigs.filter((cfg) => !!cfg.keycap).length / totalKeys) * 100
-      ),
-    [keyConfigs, totalKeys]
-  );
-
-  const percentSwitches = useMemo(
-    () =>
-      Math.round(
-        (keyConfigs.filter((cfg) => !!cfg.switch).length / totalKeys) * 100
-      ),
-    [keyConfigs, totalKeys]
-  );
-  const MemoizedBalatro = useMemo(
-    () => (
-      <Balatro
-        isRotate={false}
-        mouseInteraction={true}
-        pixelFilter={700}
-        color1="#"
-        color2="#FAE04E"
-        color3="#15368B"
-      />
-    ),
-    [] // chỉ tạo 1 lần
-  );
-  // Khi customKeys thay đổi
-  useEffect(() => {
-    if (keyConfigs.length === 0) return; // tránh lần đầu
-    setLoading(true);
-
-    const timer = setTimeout(() => {
-      setLoading(false); // tắt loading sau khi "update xong"
-    }, 200); // giả lập async / debounce
-
-    return () => clearTimeout(timer);
-  }, [keyConfigs]);
-
-  useEffect(() => {
-    setPanelPickerOpen(
-      !!selectedKey ||
-        !!selectedGroup ||
-        !!selectedKeycapGroup ||
-        (highlightKeys?.length ?? 0) > 0
-    );
-  }, [selectedKey, selectedGroup, selectedKeycapGroup, highlightKeys]);
+  const customizer = useKeyboardCustomizer();
 
   return (
     <>
       <div className=" min-h-screen w-full md:p-6">
         {/* Background Balatro */}
-        <div className="fixed inset-0 -z-20">{MemoizedBalatro}</div>
+        <div className="fixed inset-0 -z-20">
+          <Balatro
+            isRotate={false}
+            mouseInteraction={true}
+            pixelFilter={700}
+            color1="#"
+            color2="#FAE04E"
+            color3="#15368B"
+          />
+        </div>
 
         {/* Header */}
         <motion.div
@@ -346,27 +39,27 @@ export default function KeyboardCustomizerModern() {
           transition={{ duration: 0.5 }}
         >
           <HeaderBar
-            keyboardSize={keyboardSize}
-            setKeyboardSize={setKeyboardSize}
-            percentKeycaps={percentKeycaps}
-            percentSwitches={percentSwitches}
+            keyboardSize={customizer.keyboardSize}
+            setKeyboardSize={customizer.setKeyboardSize}
+            percentKeycaps={customizer.percentKeycaps}
+            percentSwitches={customizer.percentSwitches}
           />
         </motion.div>
 
         {/* Stepper */}
         <Stepper
-          selectedKit={selectedKit}
-          percentKeycaps={percentKeycaps}
-          percentSwitches={percentSwitches}
+          selectedKit={customizer.selectedKit}
+          percentKeycaps={customizer.percentKeycaps}
+          percentSwitches={customizer.percentSwitches}
         />
 
         {/* ViewMode */}
         <ViewModeSelector
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          setDrawerOpen={setDrawerOpen}
-          setSelectedGroup={setSelectedGroup}
-          setSelectedKeycapGroup={setSelectedKeycapGroup}
+          viewMode={customizer.viewMode}
+          setViewMode={customizer.setViewMode}
+          setDrawerOpen={customizer.setDrawerOpen}
+          setSelectedGroup={customizer.setSelectedGroup}
+          setSelectedKeycapGroup={customizer.setSelectedKeycapGroup}
         />
 
         {/* Keyboard center */}
@@ -377,92 +70,20 @@ export default function KeyboardCustomizerModern() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
-            {/* Stagger animation cho các phần con */}
-            <motion.div
-              className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-              initial="hidden"
-              animate="visible"
-              variants={{
-                hidden: {},
-                visible: { transition: { staggerChildren: 0.1 } },
-              }}
-            >
-              {/* Progress Indicator */}
-              <motion.div
-                className="flex flex-col items-center md:flex-row md:gap-2 gap-1"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: [50, -15, 0] }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-              >
-                <div className="w-16 h-3 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className={`h-3 rounded-full ${
-                      viewMode === "keycap" ? "bg-indigo-500" : "bg-green-500"
-                    }`}
-                    style={{
-                      width:
-                        viewMode === "keycap"
-                          ? `${percentKeycaps}%`
-                          : `${percentSwitches}%`,
-                      transition: "width 0.5s ease-out",
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col items-center md:items-start">
-                  <span className="text-xs font-semibold text-gray-700">
-                    {viewMode === "keycap" ? percentKeycaps : percentSwitches}%
-                  </span>
-                  <span className="text-[10px] text-gray-500 italic">
-                    {viewMode === "keycap"
-                      ? "Keycaps hoàn thiện"
-                      : "Switches hoàn thiện"}
-                  </span>
-                </div>
-              </motion.div>
-
-              {/* SelectedKey */}
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: [50, -10, 0] }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-              >
-                <SelectedKey selectedKey={selectedKey} />
-              </motion.div>
-
-              {/* QuickSelect */}
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: [50, -10, 0] }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-              >
-                <QuickSelectGroup
-                  baseGroups={baseGroups}
-                  selectedKeycapGroup={selectedKeycapGroup}
-                  setSelectedKeycapGroup={setSelectedKeycapGroup}
-                  selectedSwitchGroup={selectedGroup}
-                  setSelectedSwitchGroup={setSelectedGroup}
-                  viewMode={viewMode}
-                  keyConfigs={keyConfigs}
-                  setHighlightKeys={setHighlightKeys}
-                />
-              </motion.div>
-
-              {/* ActionToolbar */}
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: [50, -10, 0] }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-              >
-                <ActionToolbar
-                  viewMode={viewMode}
-                  selectedKeycapGroup={selectedKeycapGroup}
-                  setSelectedKeycapGroup={setSelectedKeycapGroup}
-                  selectedGroup={selectedGroup}
-                  setSelectedGroup={setSelectedGroup}
-                  clearAll={clearAll}
-                />
-              </motion.div>
-            </motion.div>
+            <KeyboardToolbar
+              viewMode={customizer.viewMode}
+              percentKeycaps={customizer.percentKeycaps}
+              percentSwitches={customizer.percentSwitches}
+              selectedKey={customizer.selectedKey}
+              selectedKeycapGroup={customizer.selectedKeycapGroup}
+              setSelectedKeycapGroup={customizer.setSelectedKeycapGroup}
+              selectedGroup={customizer.selectedGroup}
+              setSelectedGroup={customizer.setSelectedGroup}
+              baseGroups={customizer.baseGroups}
+              keyConfigs={customizer.keyConfigs}
+              setHighlightKeys={customizer.setHighlightKeys}
+              clearAll={customizer.clearAll}
+            />
           </motion.div>
         </div>
 
@@ -477,28 +98,28 @@ export default function KeyboardCustomizerModern() {
           >
             <motion.div
               className="w-full h-full flex justify-center items-center relative"
-              key={keyboardSize + viewMode + highlightKeys?.join(",")}
+              key={customizer.keyboardSize + customizer.viewMode}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <KeyboardFactory
-                layouts={memoLayouts}
-                keyboardSize={keyboardSize}
-                keyWidths={memoKeyWidths[keyboardSize]}
-                viewMode={viewMode}
-                keyConfigs={keyConfigs}
-                selectedKey={selectedKey}
-                setSelectedKey={setSelectedKey}
-                selectedGroup={selectedGroup}
-                selectedKeycapGroup={selectedKeycapGroup}
-                keyGroups={keyGroups}
-                switchColors={memoSwitchColors}
-                switchList={memoSwitchList}
-                keycaps={memoKeycaps}
-                highlightKeys={highlightKeys}
+                layouts={customizer.memoLayouts}
+                keyboardSize={customizer.keyboardSize}
+                keyWidths={customizer.memoKeyWidths[customizer.keyboardSize]}
+                viewMode={customizer.viewMode}
+                keyConfigs={customizer.keyConfigs}
+                selectedKey={customizer.selectedKey}
+                setSelectedKey={customizer.setSelectedKey}
+                selectedGroup={customizer.selectedGroup}
+                selectedKeycapGroup={customizer.selectedKeycapGroup}
+                keyGroups={customizer.keyGroups}
+                switchColors={customizer.memoSwitchColors}
+                switchList={customizer.memoSwitchList}
+                keycaps={customizer.memoKeycaps}
+                highlightKeys={customizer.highlightKeys}
               />
-              {loading && (
+              {customizer.loading && (
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-30 rounded-2xl">
                   <Spin size="large" />
                 </div>
@@ -512,7 +133,46 @@ export default function KeyboardCustomizerModern() {
               boxShadow: "0px 10px 30px rgba(12, 87, 118, 0.7)",
             }}
             whileTap={{ scale: 0.95 }}
-            onClick={handleExport}
+            onClick={() => {
+              const result = customizer.handleExport();
+              if (result?.error) {
+                // Hiện modal cảnh báo nếu thiếu thông tin
+                Modal.warning({
+                  title: "Thiếu thông tin xuất cấu hình",
+                  content: (
+                    <div className="space-y-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-md">
+                      {result.missingKit && (
+                        <p className="text-yellow-800">
+                          <strong>Chưa chọn bộ kit.</strong>
+                        </p>
+                      )}
+                      {result.missingKeycaps &&
+                        result.missingKeycaps.length > 0 && (
+                          <p className="text-yellow-800">
+                            <strong>Chưa chọn keycap cho các phím:</strong>{" "}
+                            {result.missingKeycaps.map((k: string) => (
+                              <Tag key={k} color="gold" className="mb-1">
+                                {k}
+                              </Tag>
+                            ))}
+                          </p>
+                        )}
+                      {result.missingSwitches &&
+                        result.missingSwitches.length > 0 && (
+                          <p className="text-red-800">
+                            <strong>Chưa chọn switch cho các phím:</strong>{" "}
+                            {result.missingSwitches.map((k: string) => (
+                              <Tag key={k} color="red" className="mb-1">
+                                {k}
+                              </Tag>
+                            ))}
+                          </p>
+                        )}
+                    </div>
+                  ),
+                });
+              }
+            }}
             className="absolute flex items-center gap-3 rounded-2xl px-4 sm:px-6 py-2 sm:py-3 text-lg sm:text-xl font-bold text-white z-20
              bottom-[-4rem] sm:bottom-[-2rem] md:bottom-[-1.5rem] right-4"
             style={{
@@ -527,41 +187,44 @@ export default function KeyboardCustomizerModern() {
       </div>
 
       <PickerDrawer
-        viewMode={viewMode}
-        open={panelPickerOpen}
-        selectedKey={selectedKey}
-        selectedGroup={selectedGroup}
-        selectedKeycapGroup={selectedKeycapGroup}
-        setSelectedKey={setSelectedKey}
-        setSelectedGroup={setSelectedGroup}
-        setSelectedKeycapGroup={setSelectedKeycapGroup}
-        filteredKeycaps={filteredKeycaps}
-        searchKeycap={searchKeycap}
-        keyConfigs={keyConfigs}
-        setSearchKeycap={setSearchKeycap}
-        handleKeycapChange={handleKeycapChange}
-        filteredSwitches={filteredSwitches}
-        selectedType={selectedType}
-        setSelectedType={setSelectedType}
-        searchSwitch={searchSwitch}
-        setSearchSwitch={setSearchSwitch}
-        handleSwitchClick={handleSwitchClick}
-        selectedSwitch={selectedSwitch}
-        setHighlightKeys={setHighlightKeys}
+        viewMode={customizer.viewMode}
+        open={customizer.panelPickerOpen}
+        selectedKey={customizer.selectedKey}
+        selectedGroup={customizer.selectedGroup}
+        selectedKeycapGroup={customizer.selectedKeycapGroup}
+        setSelectedKey={customizer.setSelectedKey}
+        setSelectedGroup={customizer.setSelectedGroup}
+        setSelectedKeycapGroup={customizer.setSelectedKeycapGroup}
+        filteredKeycaps={customizer.filteredKeycaps}
+        searchKeycap={customizer.searchKeycap}
+        keyConfigs={customizer.keyConfigs}
+        setSearchKeycap={customizer.setSearchKeycap}
+        handleKeycapChange={customizer.handleKeycapChange}
+        filteredSwitches={customizer.filteredSwitches}
+        selectedType={customizer.selectedType}
+        setSelectedType={customizer.setSelectedType}
+        searchSwitch={customizer.searchSwitch}
+        setSearchSwitch={customizer.setSearchSwitch}
+        handleSwitchClick={customizer.handleSwitchClick}
+        selectedSwitch={customizer.selectedSwitch}
+        setHighlightKeys={customizer.setHighlightKeys}
       />
 
-      <StartLayoutModal open={showLayoutPopup} onSelect={handleLayoutSelect} />
+      <StartLayoutModal
+        open={customizer.showLayoutPopup}
+        onSelect={customizer.handleLayoutSelect}
+      />
       <KitDrawer
-        kits={memoKits}
-        selectedKit={selectedKit}
-        drawerOpen={drawerOpen}
-        setDrawerOpen={setDrawerOpen}
-        onSelectKit={handleSelectKit}
+        kits={customizer.memoKits}
+        selectedKit={customizer.selectedKit}
+        drawerOpen={customizer.drawerOpen}
+        setDrawerOpen={customizer.setDrawerOpen}
+        onSelectKit={customizer.handleSelectKit}
       />
       <ExportDialog
-        showModal={showModal}
-        setShowModal={setShowModal}
-        exportData={exportData}
+        showModal={customizer.showModal}
+        setShowModal={customizer.setShowModal}
+        exportData={customizer.exportData}
       />
     </>
   );
