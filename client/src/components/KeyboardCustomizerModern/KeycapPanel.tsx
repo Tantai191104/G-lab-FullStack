@@ -1,33 +1,26 @@
 import { Empty, Input, Tag, Typography, Tooltip } from "antd";
 import { BgColorsOutlined, SearchOutlined } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
-
-type Keycap = {
-  id: string;
-  name: string;
-  color: string;
-  image?: string;
-  profile?: string;
-  material?: string;
-  price?: string;
-};
+import type { Keycap, KeyConfig } from "../types/types";
 
 type Props = {
   keycaps: Keycap[];
   searchKeycap: string;
   setSearchKeycap: (v: string) => void;
-  customKeys: Record<string, string>;
+  keyConfigs: KeyConfig[]; // dùng keyConfigs thay cho customKeys
   selectedKey: string | null;
-  handleKeycapChange: (id: string) => void;
+  handleKeycapChange: (keycap: Keycap, targets?: string[]) => void; // truyền object
+  highlightKeys?: string[];
 };
 
 export function KeycapPanel({
   keycaps,
   searchKeycap,
   setSearchKeycap,
-  customKeys,
+  keyConfigs,
   selectedKey,
   handleKeycapChange,
+  highlightKeys,
 }: Props) {
   // Filter keycaps by search
   const filteredKeycaps = keycaps.filter((cap) =>
@@ -48,6 +41,23 @@ export function KeycapPanel({
     hidden: { opacity: 0, y: 10 },
     visible: { opacity: 1, y: 0 },
     exit: { opacity: 0, y: -10 },
+  };
+
+  // Lấy trạng thái đã chọn từ keyConfigs
+  const getIsSelected = (cap: Keycap) => {
+    if (!selectedKey) return false;
+    const cfg = keyConfigs.find((c) => c.key === selectedKey);
+    return cfg?.keycap?.id === cap.id;
+  };
+
+  // Khi click chọn keycap
+  const handleClick = (cap: Keycap) => {
+    // Nếu có highlightKeys thì apply cho tất cả, không thì chỉ selectedKey
+    if (highlightKeys && highlightKeys.length > 0) {
+      handleKeycapChange(cap, highlightKeys);
+    } else {
+      handleKeycapChange(cap, selectedKey ? [selectedKey] : []);
+    }
   };
 
   return (
@@ -90,8 +100,7 @@ export function KeycapPanel({
         >
           <AnimatePresence>
             {filteredKeycaps.map((cap) => {
-              const isSelected =
-                selectedKey && customKeys[selectedKey] === cap.id;
+              const isSelected = getIsSelected(cap);
 
               return (
                 <motion.div
@@ -112,7 +121,7 @@ export function KeycapPanel({
                         padding: "12px",
                         boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
                         minWidth: 220,
-                      }
+                      },
                     }}
                     title={
                       <div className="flex flex-col gap-2">
@@ -125,7 +134,9 @@ export function KeycapPanel({
                             />
                           )}
                           <div>
-                            <div className="font-semibold text-gray-800">{cap.name}</div>
+                            <div className="font-semibold text-gray-800">
+                              {cap.name}
+                            </div>
                             <Tag
                               style={{
                                 backgroundColor: cap.color,
@@ -156,9 +167,13 @@ export function KeycapPanel({
                     }
                   >
                     <div
-                      onClick={() => handleKeycapChange(cap.id)}
+                      onClick={() => handleClick(cap)}
                       className={`flex items-center justify-between rounded-xl border p-3 transition hover:shadow-md cursor-pointer 
-      ${isSelected ? "border-blue-500 bg-white/70" : "border-gray-200 bg-white/40"}`}
+      ${
+        isSelected
+          ? "border-blue-500 bg-white/70"
+          : "border-gray-200 bg-white/40"
+      }`}
                     >
                       <div className="flex items-center gap-3">
                         {cap.image ? (
@@ -174,7 +189,9 @@ export function KeycapPanel({
                           />
                         )}
                         <div className="flex flex-col">
-                          <span className="font-medium text-gray-800">{cap.name}</span>
+                          <span className="font-medium text-gray-800">
+                            {cap.name}
+                          </span>
                           <Tag
                             style={{
                               backgroundColor: cap.color,
@@ -190,7 +207,6 @@ export function KeycapPanel({
                       </div>
                     </div>
                   </Tooltip>
-
                 </motion.div>
               );
             })}

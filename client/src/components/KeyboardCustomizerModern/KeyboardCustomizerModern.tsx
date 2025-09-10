@@ -3,20 +3,17 @@ import { Modal, Spin, Tag } from "antd";
 import data from "../../data/keyboardData.json";
 import { HeaderBar } from "./HeaderBar";
 import { KeyboardFactory } from "./KeyboardDisplayFactory";
-import {
-  AppstoreOutlined,
-  ExportOutlined,
-  PlusCircleOutlined,
-} from "@ant-design/icons";
-import { FaKeyboard } from "react-icons/fa";
+import { ExportOutlined } from "@ant-design/icons";
 import { SelectedKey } from "./SelectedKey";
 import { QuickSelectGroup } from "./QuickSelectGroup";
 import { motion } from "framer-motion";
 import { PickerDrawer } from "./PickerDrawer";
 import { ActionToolbar } from "./ActionToolbar";
 import type {
+  ExportPayload,
   KeyboardSize,
   Keycap,
+  KeyConfig,
   KeyGroups,
   KeyObject,
   SwitchItem,
@@ -26,6 +23,7 @@ import StartLayoutModal from "./StartLayoutModal";
 import KitDrawer from "./KitDrawer";
 import ExportDialog from "./ExportDialog";
 import Stepper from "./Stepper";
+import { ViewModeSelector } from "./ViewModeSelector";
 
 export default function KeyboardCustomizerModern() {
   const {
@@ -79,19 +77,11 @@ export default function KeyboardCustomizerModern() {
   const [selectedSwitch, setSelectedSwitch] = useState<string | null>(null);
   const [selectedKit, setSelectedKit] = useState<string | null>(null);
 
-  const [customKeys, setCustomKeys] = useState<Record<string, string>>({});
-  const [customSwitches, setCustomSwitches] = useState<Record<string, string>>(
-    {}
-  );
+  const [keyConfigs, setKeyConfigs] = useState<KeyConfig[]>([]);
   const [highlightKeys, setHighlightKeys] = useState<string[] | undefined>(
     undefined
   );
-  const [exportData, setExportData] = useState<{
-    size: string;
-    mainKeycap: string;
-    keycapOthers: Record<string, string[]>;
-    perKeySwitch: Record<string, string>;
-  } | null>(null);
+  const [exportData, setExportData] = useState<ExportPayload | null>(null);
 
   const [showModal, setShowModal] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -117,22 +107,18 @@ export default function KeyboardCustomizerModern() {
   );
 
   useEffect(() => {
-    setCustomKeys((prev) => {
-      const next: Record<string, string> = {};
-      allKeysForSize.forEach((k) => (next[k] = prev[k] || ""));
-      return next;
-    });
-    setCustomSwitches((prev) => {
-      const next: Record<string, string> = {};
-      allKeysForSize.forEach((k) => (next[k] = prev[k] || ""));
+    setKeyConfigs((prev) => {
+      const next: KeyConfig[] = allKeysForSize.map((key) => {
+        const found = prev.find((cfg) => cfg.key === key);
+        return found || { key };
+      });
       return next;
     });
   }, [allKeysForSize]);
-
   // ==== Actions ====
   // Hàm apply chung cho keycap hoặc switch
   const handleApplyToTargets = useCallback(
-    (value: string, type: "keycap" | "switch") => {
+    (value: Keycap | SwitchItem, type: "keycap" | "switch") => {
       let targets: string[] = [];
 
       if (highlightKeys?.length) {
@@ -149,19 +135,15 @@ export default function KeyboardCustomizerModern() {
 
       if (!targets.length) return;
 
-      if (type === "keycap") {
-        setCustomKeys((prev) => {
-          const next = { ...prev };
-          targets.forEach((k) => (next[k] = value));
-          return next;
-        });
-      } else {
-        setCustomSwitches((prev) => {
-          const next = { ...prev };
-          targets.forEach((k) => (next[k] = value));
-          return next;
-        });
-      }
+      setKeyConfigs((prev) =>
+        prev.map((cfg) =>
+          targets.includes(cfg.key)
+            ? type === "keycap"
+              ? { ...cfg, keycap: value as Keycap }
+              : { ...cfg, switch: value as SwitchItem }
+            : cfg
+        )
+      );
     },
     [
       highlightKeys,
@@ -169,38 +151,30 @@ export default function KeyboardCustomizerModern() {
       selectedGroup,
       selectedKeycapGroup,
       keyGroups,
-      setCustomKeys,
-      setCustomSwitches,
+      setKeyConfigs,
     ]
   );
 
   // handle riêng cho keycap và switch dùng chung handleApplyToTargets
   const handleKeycapChange = useCallback(
-    (capId: string) => handleApplyToTargets(capId, "keycap"),
+    (keycapObj: Keycap) => handleApplyToTargets(keycapObj, "keycap"),
     [handleApplyToTargets]
   );
 
   const handleSwitchClick = useCallback(
-    (swName: string) => handleApplyToTargets(swName, "switch"),
+    (switchObj: SwitchItem) => handleApplyToTargets(switchObj, "switch"),
     [handleApplyToTargets]
   );
 
   const clearAll = useCallback(() => {
-    const cleared: Record<string, string> = {};
-    allKeysForSize.forEach((k) => {
-      cleared[k] = "";
-    });
-
-    setCustomKeys(cleared);
-    setCustomSwitches({ ...cleared });
+    setKeyConfigs(allKeysForSize.map((key) => ({ key })));
     setSelectedKey(null);
     setSelectedGroup(null);
     setSelectedKeycapGroup(null);
     setSelectedSwitch(null);
   }, [
     allKeysForSize,
-    setCustomKeys,
-    setCustomSwitches,
+    setKeyConfigs,
     setSelectedKey,
     setSelectedGroup,
     setSelectedKeycapGroup,
@@ -208,22 +182,29 @@ export default function KeyboardCustomizerModern() {
   ]);
 
   const handleExport = useCallback(() => {
-    const missingKeycaps: string[] = [];
-    const missingSwitches: string[] = [];
+    const missingKeycaps = keyConfigs
+      .filter((cfg) => !cfg.keycap)
+      .map((cfg) => cfg.key);
+    const missingSwitches = keyConfigs
+      .filter((cfg) => !cfg.switch)
+      .map((cfg) => cfg.key);
 
-    allKeysForSize.forEach((key) => {
-      if (!customKeys[key]) missingKeycaps.push(key);
-      if (!customSwitches[key]) missingSwitches.push(key);
-    });
+    // Kiểm tra thiếu kit
+    const missingKit = !selectedKit;
 
-    if (missingKeycaps.length || missingSwitches.length) {
+    if (missingKeycaps.length || missingSwitches.length || missingKit) {
       Modal.warning({
-        title: "Thiếu thông tin phím",
+        title: "Thiếu thông tin xuất cấu hình",
         content: (
           <div className="space-y-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-md">
+            {missingKit && (
+              <p className="text-yellow-800">
+                <strong>Chưa chọn bộ kit.</strong>
+              </p>
+            )}
             {missingKeycaps.length > 0 && (
               <p className="text-yellow-800">
-                <strong>Chưa chọn keycap:</strong>{" "}
+                <strong>Chưa chọn keycap cho các phím:</strong>{" "}
                 {missingKeycaps.map((k) => (
                   <Tag key={k} color="gold" className="mb-1">
                     {k}
@@ -233,7 +214,7 @@ export default function KeyboardCustomizerModern() {
             )}
             {missingSwitches.length > 0 && (
               <p className="text-red-800">
-                <strong>Chưa chọn switch:</strong>{" "}
+                <strong>Chưa chọn switch cho các phím:</strong>{" "}
                 {missingSwitches.map((k) => (
                   <Tag key={k} color="red" className="mb-1">
                     {k}
@@ -247,38 +228,13 @@ export default function KeyboardCustomizerModern() {
       return;
     }
 
-    const counts: Record<string, number> = {};
-    Object.values(customKeys).forEach((cap) => {
-      if (!cap) return;
-      counts[cap] = (counts[cap] || 0) + 1;
-    });
-
-    const mainKeycap =
-      Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || "";
-
-    const others: Record<string, string[]> = {};
-    Object.entries(customKeys).forEach(([key, cap]) => {
-      if (cap && cap !== mainKeycap) {
-        if (!others[cap]) others[cap] = [];
-        others[cap].push(key);
-      }
-    });
-
     setExportData({
-      size: keyboardSize,
-      mainKeycap,
-      keycapOthers: others,
-      perKeySwitch: customSwitches,
+      layout: keyboardSize,
+      kit: selectedKit,
+      keyConfigs,
     });
     setShowModal(true);
-  }, [
-    allKeysForSize,
-    customKeys,
-    customSwitches,
-    keyboardSize,
-    setExportData,
-    setShowModal,
-  ]);
+  }, [keyConfigs, keyboardSize, selectedKit, setExportData, setShowModal]);
 
   const handleLayoutSelect = (size: "60" | "80" | "full") => {
     setKeyboardSize(size);
@@ -330,16 +286,17 @@ export default function KeyboardCustomizerModern() {
   const percentKeycaps = useMemo(
     () =>
       Math.round(
-        (Object.values(customKeys).filter(Boolean).length / totalKeys) * 100
+        (keyConfigs.filter((cfg) => !!cfg.keycap).length / totalKeys) * 100
       ),
-    [customKeys, totalKeys]
+    [keyConfigs, totalKeys]
   );
+
   const percentSwitches = useMemo(
     () =>
       Math.round(
-        (Object.values(customSwitches).filter(Boolean).length / totalKeys) * 100
+        (keyConfigs.filter((cfg) => !!cfg.switch).length / totalKeys) * 100
       ),
-    [customSwitches, totalKeys]
+    [keyConfigs, totalKeys]
   );
   const MemoizedBalatro = useMemo(
     () => (
@@ -356,27 +313,15 @@ export default function KeyboardCustomizerModern() {
   );
   // Khi customKeys thay đổi
   useEffect(() => {
-    if (Object.keys(customKeys).length === 0) return; // tránh lần đầu
+    if (keyConfigs.length === 0) return; // tránh lần đầu
     setLoading(true);
 
     const timer = setTimeout(() => {
       setLoading(false); // tắt loading sau khi "update xong"
-    }, 200); // giả lập async / debounce, có thể chỉnh thời gian
+    }, 200); // giả lập async / debounce
 
     return () => clearTimeout(timer);
-  }, [customKeys]);
-
-  // Khi customSwitches thay đổi
-  useEffect(() => {
-    if (Object.keys(customSwitches).length === 0) return;
-    setLoading(true);
-
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, [customSwitches]);
+  }, [keyConfigs]);
 
   useEffect(() => {
     setPanelPickerOpen(
@@ -416,80 +361,13 @@ export default function KeyboardCustomizerModern() {
         />
 
         {/* ViewMode */}
-        <motion.div
-          className="flex flex-col items-center gap-4 pb-2 border-b border-gray-200"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <span className="text-3xl font-bold text-white">Chế độ hiển thị</span>
-          <div className="flex w-full max-w-[500px] gap-4 relative">
-            {/* Keycaps Button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              animate={{
-                backgroundColor: viewMode === "keycap" ? "#6366f1" : "#ffffff",
-                color: viewMode === "keycap" ? "#ffffff" : "#374151",
-                boxShadow:
-                  viewMode === "keycap"
-                    ? "0px 4px 15px rgba(99, 102, 241, 0.5)"
-                    : "0px 2px 5px rgba(0,0,0,0.1)",
-              }}
-              transition={{ duration: 0.5 }}
-              className="flex-1 py-3 flex items-center justify-center gap-2 rounded-xl text-lg font-semibold cursor-pointer"
-              onClick={() => {
-                setViewMode("keycap");
-                setSelectedGroup(null);
-                setSelectedKeycapGroup(null);
-              }}
-            >
-              <FaKeyboard style={{ fontSize: 22 }} />
-              Keycaps
-            </motion.button>
-
-            {/* Switches Button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              animate={{
-                backgroundColor: viewMode === "switch" ? "#6366f1" : "#ffffff",
-                color: viewMode === "switch" ? "#ffffff" : "#374151",
-                boxShadow:
-                  viewMode === "switch"
-                    ? "0px 4px 15px rgba(99, 102, 241, 0.5)"
-                    : "0px 2px 5px rgba(0,0,0,0.1)",
-              }}
-              transition={{ duration: 0.5 }}
-              className="flex-1 py-3 flex items-center justify-center gap-2 rounded-xl text-lg font-semibold cursor-pointer"
-              onClick={() => {
-                setViewMode("switch");
-                setSelectedGroup(null);
-                setSelectedKeycapGroup(null);
-              }}
-            >
-              <PlusCircleOutlined style={{ fontSize: 22 }} />
-              Switches
-            </motion.button>
-
-            {/* Bộ kit Button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.5 }}
-              className="flex-1 py-3 flex items-center justify-center gap-2 rounded-xl text-lg font-semibold cursor-pointer"
-              style={{
-                background: "linear-gradient(90deg, #0C5776, #0A74DA)",
-                color: "#fff",
-                boxShadow: "0px 4px 15px rgba(12, 87, 118, 0.4)",
-              }}
-              onClick={() => setDrawerOpen(true)}
-            >
-              <AppstoreOutlined style={{ fontSize: 22 }} />
-              Bộ kit
-            </motion.button>
-          </div>
-        </motion.div>
+        <ViewModeSelector
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          setDrawerOpen={setDrawerOpen}
+          setSelectedGroup={setSelectedGroup}
+          setSelectedKeycapGroup={setSelectedKeycapGroup}
+        />
 
         {/* Keyboard center */}
         <div className="relative z-10 flex justify-center mt-2">
@@ -564,8 +442,7 @@ export default function KeyboardCustomizerModern() {
                   selectedSwitchGroup={selectedGroup}
                   setSelectedSwitchGroup={setSelectedGroup}
                   viewMode={viewMode}
-                  customKeys={customKeys} // thêm đây
-                  customSwitches={customSwitches} // thêm đây
+                  keyConfigs={keyConfigs}
                   setHighlightKeys={setHighlightKeys}
                 />
               </motion.div>
@@ -610,8 +487,7 @@ export default function KeyboardCustomizerModern() {
                 keyboardSize={keyboardSize}
                 keyWidths={memoKeyWidths[keyboardSize]}
                 viewMode={viewMode}
-                customKeys={customKeys}
-                customSwitches={customSwitches}
+                keyConfigs={keyConfigs}
                 selectedKey={selectedKey}
                 setSelectedKey={setSelectedKey}
                 selectedGroup={selectedGroup}
@@ -661,8 +537,8 @@ export default function KeyboardCustomizerModern() {
         setSelectedKeycapGroup={setSelectedKeycapGroup}
         filteredKeycaps={filteredKeycaps}
         searchKeycap={searchKeycap}
+        keyConfigs={keyConfigs}
         setSearchKeycap={setSearchKeycap}
-        customKeys={customKeys}
         handleKeycapChange={handleKeycapChange}
         filteredSwitches={filteredSwitches}
         selectedType={selectedType}

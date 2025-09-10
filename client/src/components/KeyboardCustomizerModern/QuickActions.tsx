@@ -33,7 +33,9 @@ export function QuickActions({
   };
 
   const selectedKeycap = keycaps.find((k) => k.id === lastAppliedKeycap);
-  const selectedSwitch = filteredSwitches.find((s) => s.name === lastAppliedSwitch);
+  const selectedSwitch = filteredSwitches.find(
+    (s) => s.name === lastAppliedSwitch
+  );
 
   return (
     <Card
@@ -104,7 +106,6 @@ export function QuickActions({
           </Button>
         </div>
       </div>
-
     </Card>
   );
 }

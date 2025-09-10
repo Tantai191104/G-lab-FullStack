@@ -1,205 +1,238 @@
-import { Fragment, useRef, memo } from "react";
-import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Transition,
+} from "@headlessui/react";
+import { Fragment } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import clsx from "clsx";
+import type { KeyConfig, KeyboardSize } from "../types/types";
 
-type ExportData = {
-    size: string;
-    mainKeycap: string;
-    keycapOthers: Record<string, string[]>;
-    perKeySwitch: Record<string, string>;
-};
-
-type Props = {
-    showModal: boolean;
-    setShowModal: (v: boolean) => void;
-    exportData: ExportData | null;
-};
-
-// 👉 Gom nhóm theo value
-function groupByValue(obj: Record<string, string>) {
-    const grouped: Record<string, string[]> = {};
-    for (const [key, val] of Object.entries(obj)) {
-        const label = val || "Chưa chọn";
-        if (!grouped[label]) grouped[label] = [];
-        grouped[label].push(key);
-    }
-    return grouped;
+export interface ExportDialogProps {
+  showModal: boolean;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  exportData: {
+    layout: KeyboardSize;
+    kit: string | null;
+    keyConfigs: KeyConfig[];
+  } | null;
 }
 
-function ExportDialogComponent({ showModal, setShowModal, exportData }: Props) {
-    const containerRef = useRef<HTMLDivElement | null>(null);
+function groupBy<T>(
+  arr: T[] = [],
+  getKey: (item: T) => string
+): Record<string, T[]> {
+  return (arr ?? []).reduce((acc, item) => {
+    const key = getKey(item);
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
+    return acc;
+  }, {} as Record<string, T[]>);
+}
 
-    // Scroll tới nhóm switch khi hover
-    const handleHoverGroup = (id: string) => {
-        const el = document.getElementById(id);
-        if (el && containerRef.current) {
-            containerRef.current.scrollTo({
-                top: el.offsetTop - containerRef.current.offsetTop,
-                behavior: "smooth",
-            });
-        }
-    };
+const blockVariant = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { staggerChildren: 0.08 } },
+  exit: { opacity: 0, y: -20 },
+};
+const itemVariant = {
+  hidden: { opacity: 0, scale: 0.98 },
+  visible: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.98 },
+};
 
-    return (
-        <Transition show={showModal} as={Fragment}>
-            <Dialog as="div" className="relative z-50" onClose={setShowModal}>
-                {/* Backdrop */}
-                <TransitionChild
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-50"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-50"
-                    leaveTo="opacity-0"
-                >
-                    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm" />
-                </TransitionChild>
+export default function ExportDialog({
+  showModal,
+  setShowModal,
+  exportData,
+}: ExportDialogProps) {
+  // Nếu chưa có dữ liệu thì không render
+  if (!exportData) return null;
 
-                <div className="fixed inset-0 overflow-y-auto">
-                    <div className="flex min-h-full items-end justify-center p-4 sm:items-center sm:p-0">
-                        <TransitionChild
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
-                            enterTo="opacity-100 translate-y-0 sm:scale-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-                            leaveTo="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95"
-                        >
-                            <DialogPanel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 shadow-xl">
-                                {/* Header */}
-                                <div className="flex justify-between items-center mb-4">
-                                    <DialogTitle className="text-lg font-bold text-gray-900">
-                                        Kết quả cấu hình
-                                    </DialogTitle>
-                                    <button
-                                        className="text-gray-400 hover:text-gray-600"
-                                        onClick={() => setShowModal(false)}
-                                    >
-                                        <XMarkIcon className="h-6 w-6" />
-                                    </button>
-                                </div>
+  const { layout, kit, keyConfigs } = exportData;
 
-                                {!exportData ? (
-                                    <div className="text-gray-500 text-center py-8">
-                                        Chưa có dữ liệu
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col gap-5">
-                                        {/* Thông tin chung */}
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <div className="text-gray-500 text-sm">Kích thước</div>
-                                                <div className="font-semibold text-gray-800">
-                                                    {exportData.size}
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div className="text-gray-500 text-sm">Keycap chính</div>
-                                                <div className="font-semibold text-gray-800">
-                                                    {exportData.mainKeycap}
-                                                </div>
-                                            </div>
-                                        </div>
+  // Nhóm các phím theo switch (chỉ lấy nếu có switch)
+  const switchGroups = groupBy(
+    keyConfigs.filter((cfg) => cfg.switch),
+    (cfg) => cfg.switch?.name ?? "Chưa chọn"
+  );
 
-                                        {/* Keycap khác */}
-                                        {Object.keys(exportData.keycapOthers).length > 0 && (
-                                            <div>
-                                                <div className="font-semibold mb-2">Các keycap custom:</div>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {Object.entries(exportData.keycapOthers).map(
-                                                        ([cap, keys]) => (
-                                                            <motion.div
-                                                                key={cap}
-                                                                whileHover={{ scale: 1.05 }}
-                                                                className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-sm font-medium cursor-pointer"
-                                                                onMouseEnter={() => handleHoverGroup(cap)}
-                                                            >
-                                                                {cap} ({keys.length} phím)
-                                                            </motion.div>
-                                                        )
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )}
+  // Nhóm các phím theo keycap (chỉ lấy nếu có keycap)
+  const keycapGroups = groupBy(
+    keyConfigs.filter((cfg) => cfg.keycap),
+    (cfg) => cfg.keycap?.name ?? "Chưa chọn"
+  );
 
-                                        <div className="border-t border-gray-200 pt-3 font-semibold">
-                                            Switch từng nhóm
-                                        </div>
-
-                                        {/* Switch từng phím */}
-                                        <div
-                                            className="max-h-72 overflow-y-auto border rounded-xl p-3 space-y-3 bg-gray-50"
-                                            ref={containerRef}
-                                        >
-                                            <AnimatePresence>
-                                                {Object.entries(groupByValue(exportData.perKeySwitch)).map(
-                                                    ([sw, keys]) => (
-                                                        <motion.div
-                                                            key={sw}
-                                                            id={sw}
-                                                            initial={{ opacity: 0, y: 10 }}
-                                                            animate={{ opacity: 1, y: 0 }}
-                                                            exit={{ opacity: 0, y: 10 }}
-                                                            whileHover={{
-                                                                scale: 1.02,
-                                                                boxShadow: "0 5px 15px rgba(0,0,0,0.15)",
-                                                            }}
-                                                            className="border rounded-lg p-3 bg-white cursor-pointer shadow-sm transition"
-                                                        >
-                                                            <div className="font-medium text-gray-800 mb-1">
-                                                                {sw}{" "}
-                                                                <span className="text-xs text-gray-500">
-                                                                    ({keys.length} phím)
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex flex-wrap gap-1 text-sm text-gray-600">
-                                                                {keys.map((k) => (
-                                                                    <motion.div
-                                                                        key={k}
-                                                                        whileHover={{ scale: 1.2 }}
-                                                                        className={clsx(
-                                                                            "px-2 py-1 rounded bg-gray-100 text-gray-800 text-xs font-medium"
-                                                                        )}
-                                                                    >
-                                                                        {k}
-                                                                    </motion.div>
-                                                                ))}
-                                                            </div>
-                                                        </motion.div>
-                                                    )
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="mt-4 flex justify-end">
-                                    <button
-                                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
-                                        onClick={() => setShowModal(false)}
-                                    >
-                                        Đóng
-                                    </button>
-                                </div>
-                            </DialogPanel>
-                        </TransitionChild>
+  return (
+    <AnimatePresence>
+      {showModal && (
+        <Transition show={showModal} as={Fragment} enter="" leave="">
+          <Dialog
+            as="div"
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            onClose={setShowModal}
+          >
+            <motion.div
+              className="fixed inset-0 bg-black/30"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              aria-hidden="true"
+            />
+            <div className="fixed inset-0 overflow-y-auto flex items-center justify-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 40 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 40 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+                className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl relative"
+              >
+                <DialogPanel>
+                  <DialogTitle className="text-lg font-bold mb-4 text-indigo-700">
+                    Xuất cấu hình bàn phím
+                  </DialogTitle>
+                  {/* Thông tin layout và kit */}
+                  <div className="mb-6 flex flex-col gap-2">
+                    <div className="flex items-center gap-4">
+                      <span className="font-semibold text-gray-700">
+                        Layout:
+                      </span>
+                      <span className="px-3 py-1 rounded bg-indigo-100 text-indigo-700 font-medium text-base">
+                        {layout}
+                      </span>
                     </div>
-                </div>
-            </Dialog>
-        </Transition>
-    );
-}
+                    <div className="flex items-center gap-4">
+                      <span className="font-semibold text-gray-700">
+                        Bộ kit:
+                      </span>
+                      <span className="px-3 py-1 rounded bg-yellow-100 text-yellow-700 font-medium text-base">
+                        {kit || "Chưa chọn"}
+                      </span>
+                    </div>
+                  </div>
 
-// 👉 Memo hoá với so sánh shallow cho showModal, deep cho exportData
-const ExportDialog = memo(
-    ExportDialogComponent,
-    (prev, next) =>
-        prev.showModal === next.showModal &&
-        prev.setShowModal === next.setShowModal &&
-        JSON.stringify(prev.exportData) === JSON.stringify(next.exportData)
-);
-export default ExportDialog
+                  {/* Block nhóm switch */}
+                  <div className="mb-6">
+                    <div className="font-semibold mb-2 text-gray-800 text-base">
+                      Nhóm phím theo Switch
+                    </div>
+                    <motion.div
+                      className="rounded-xl bg-gray-50 p-4 shadow-sm max-h-[260px] overflow-y-auto flex flex-col gap-4"
+                      variants={blockVariant}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                    >
+                      <AnimatePresence>
+                        {Object.entries(switchGroups).map(([swName, items]) => (
+                          <motion.div
+                            key={swName}
+                            variants={itemVariant}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                          >
+                            <div className="border rounded-lg p-3 bg-white flex flex-col gap-2">
+                              <div className="flex items-center gap-3 mb-2">
+                                {items[0].switch?.image && (
+                                  <img
+                                    src={items[0].switch.image}
+                                    alt={swName}
+                                    className="w-8 h-8 object-contain rounded"
+                                  />
+                                )}
+                                <span className="font-medium text-gray-900 text-base">
+                                  {swName}
+                                </span>
+                                <span className="text-xs text-gray-500 ml-2">
+                                  ({items.length} phím)
+                                </span>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {items.map((cfg) => (
+                                  <span
+                                    key={cfg.key}
+                                    className="px-2 py-1 rounded bg-gray-200 text-gray-800 text-xs font-semibold"
+                                  >
+                                    {cfg.key}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </motion.div>
+                  </div>
+
+                  {/* Block nhóm keycap */}
+                  <div className="mb-4">
+                    <div className="font-semibold mb-2 text-blue-800 text-base">
+                      Nhóm phím theo Keycap
+                    </div>
+                    <motion.div
+                      className="rounded-xl bg-blue-50 p-4 shadow-sm max-h-[260px] overflow-y-auto flex flex-col gap-4"
+                      variants={blockVariant}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                    >
+                      <AnimatePresence>
+                        {Object.entries(keycapGroups).map(([kcName, items]) => (
+                          <motion.div
+                            key={kcName}
+                            variants={itemVariant}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                          >
+                            <div className="border rounded-lg p-3 bg-white flex flex-col gap-2">
+                              <div className="flex items-center gap-3 mb-2">
+                                {items[0].keycap?.image && (
+                                  <img
+                                    src={items[0].keycap.image}
+                                    alt={kcName}
+                                    className="w-8 h-8 object-contain rounded"
+                                  />
+                                )}
+                                <span className="font-medium text-blue-900 text-base">
+                                  {kcName}
+                                </span>
+                                <span className="text-xs text-gray-500 ml-2">
+                                  ({items.length} phím)
+                                </span>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {items.map((cfg) => (
+                                  <span
+                                    key={cfg.key}
+                                    className="px-2 py-1 rounded bg-blue-200 text-blue-900 text-xs font-semibold"
+                                  >
+                                    {cfg.key}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </AnimatePresence>
+                    </motion.div>
+                  </div>
+
+                  <div className="mt-6 flex justify-end">
+                    <button
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                      onClick={() => setShowModal(false)}
+                    >
+                      Đóng
+                    </button>
+                  </div>
+                </DialogPanel>
+              </motion.div>
+            </div>
+          </Dialog>
+        </Transition>
+      )}
+    </AnimatePresence>
+  );
+}

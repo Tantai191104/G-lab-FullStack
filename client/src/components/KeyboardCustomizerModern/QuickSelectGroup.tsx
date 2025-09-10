@@ -1,6 +1,6 @@
 import { Modal } from "antd";
 import React, { useLayoutEffect, useRef, useState } from "react";
-import type { KeyGroups } from "../types/types";
+import type { KeyGroups, KeyConfig } from "../types/types";
 
 type Props = {
   baseGroups: KeyGroups;
@@ -9,8 +9,7 @@ type Props = {
   selectedSwitchGroup: string | null;
   setSelectedSwitchGroup: (g: string | null, keys?: string[]) => void;
   viewMode: "keycap" | "switch";
-  customKeys?: Record<string, string>;
-  customSwitches?: Record<string, string>;
+  keyConfigs: KeyConfig[];
   setHighlightKeys?: (keys: string[]) => void;
 };
 
@@ -21,8 +20,7 @@ function QuickSelectGroupComponent({
   selectedSwitchGroup,
   setSelectedSwitchGroup,
   viewMode,
-  customKeys = {},
-  customSwitches = {},
+  keyConfigs,
   setHighlightKeys,
 }: Props) {
   const groups = Object.keys(baseGroups);
@@ -35,10 +33,16 @@ function QuickSelectGroupComponent({
     if (!groupName || !baseGroups[groupName]) return;
 
     const groupKeys = baseGroups[groupName];
-    const customMap = viewMode === "keycap" ? customKeys : customSwitches;
 
-    const keysCustomed = groupKeys.filter((k) => customMap[k] && customMap[k] !== "");
-    const keysNotCustomed = groupKeys.filter((k) => !customMap[k] || customMap[k] === "");
+    // Lấy trạng thái custom từ keyConfigs
+    const keysCustomed = groupKeys.filter((k) => {
+      const cfg = keyConfigs.find((c) => c.key === k);
+      return viewMode === "keycap" ? !!cfg?.keycap : !!cfg?.switch;
+    });
+    const keysNotCustomed = groupKeys.filter((k) => {
+      const cfg = keyConfigs.find((c) => c.key === k);
+      return viewMode === "keycap" ? !cfg?.keycap : !cfg?.switch;
+    });
 
     if (keysCustomed.length > 0) {
       if (setHighlightKeys) setHighlightKeys(keysCustomed);
@@ -70,7 +74,8 @@ function QuickSelectGroupComponent({
 
   // Cập nhật activeValue mỗi khi selectedKeycapGroup hoặc selectedSwitchGroup thay đổi
   useLayoutEffect(() => {
-    const newValue = viewMode === "keycap" ? selectedKeycapGroup : selectedSwitchGroup;
+    const newValue =
+      viewMode === "keycap" ? selectedKeycapGroup : selectedSwitchGroup;
     if (newValue !== activeValue) {
       setActiveValue(newValue);
 
@@ -94,13 +99,13 @@ function QuickSelectGroupComponent({
     setValue: (g: string | null, keys?: string[]) => void
   ) => (
     <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-wrap relative">
-      <span className="text-sm font-semibold text-gray-700 min-w-[100px]">{label}:</span>
+      <span className="text-sm font-semibold text-gray-700 min-w-[100px]">
+        {label}:
+      </span>
 
       <div className="flex gap-2 flex-wrap relative">
         {/* Background chung cho tất cả nút */}
-        <div
-          className="absolute top-0 left-0 h-full w-full rounded-full bg-[#B6B7BF] opacity-50 z-0"
-        />
+        <div className="absolute top-0 left-0 h-full w-full rounded-full bg-[#B6B7BF] opacity-50 z-0" />
 
         {/* Highlight gradient pill */}
         <div
@@ -119,10 +124,11 @@ function QuickSelectGroupComponent({
             }}
             onClick={() => handleGroupClick(g, setValue)}
             className={`relative z-20 px-4 py-1 rounded-full text-[16px] font-medium transition-colors duration-300 focus:outline-none select-none
-          ${value === g
-                ? "text-white" // chữ trắng khi active
-                : "text-[#15368B] hover:bg-[#FAE04E] hover:text-[#15368B]"
-              }
+          ${
+            value === g
+              ? "text-white" // chữ trắng khi active
+              : "text-[#15368B] hover:bg-[#FAE04E] hover:text-[#15368B]"
+          }
         `}
           >
             {g}
@@ -149,7 +155,7 @@ export const QuickSelectGroup = React.memo(
     prev.viewMode === next.viewMode &&
     prev.selectedKeycapGroup === next.selectedKeycapGroup &&
     prev.selectedSwitchGroup === next.selectedSwitchGroup &&
-    Object.keys(prev.baseGroups).join(",") === Object.keys(next.baseGroups).join(",") &&
-    JSON.stringify(prev.customKeys) === JSON.stringify(next.customKeys) &&
-    JSON.stringify(prev.customSwitches) === JSON.stringify(next.customSwitches)
+    Object.keys(prev.baseGroups).join(",") ===
+      Object.keys(next.baseGroups).join(",") &&
+    JSON.stringify(prev.keyConfigs) === JSON.stringify(next.keyConfigs)
 );

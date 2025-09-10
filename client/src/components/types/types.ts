@@ -25,19 +25,36 @@ export type KeyObject = {
   bottom?: string;
 };
 export type Props = {
-    layouts: Record<string, KeyObject[][]>;
-    keyboardSize: string;
-    keyWidths: Record<string, number>;
-    viewMode: "keycap" | "switch";
-    customKeys: Record<string, string>;
-    customSwitches: Record<string, string>;
-    selectedKey: string | null;
-    setSelectedKey: (v: string | null) => void;
-    selectedGroup: string | null;
-    selectedKeycapGroup: string | null;
-    keyGroups: Record<string, string[]>;
-    switchColors: Record<string, string>;
-    switchList: SwitchItem[];
-    keycaps: Keycap[];
-    highlightKeys?: string[];
+  layouts: Record<string, KeyObject[][]>;
+  keyboardSize: string;
+  keyWidths: Record<string, number>;
+  viewMode: "keycap" | "switch";
+  keyConfigs: KeyConfig[];
+  selectedKey: string | null;
+  setSelectedKey: (v: string | null) => void;
+  selectedGroup: string | null;
+  selectedKeycapGroup: string | null;
+  keyGroups: Record<string, string[]>;
+  switchColors: Record<string, string>;
+  switchList: SwitchItem[];
+  keycaps: Keycap[];
+  highlightKeys?: string[];
+};
+
+export type KeyConfig = {
+  key: string; // tên phím, ví dụ "A", "Enter", "Space"
+  keycap?: Keycap; // keycap hiện tại
+  switch?: SwitchItem; // switch hiện tại
+};
+
+// Props cho ExportDialog
+export interface ExportDialogProps {
+  showModal: boolean;
+  setShowModal: (v: boolean) => void;
+  keyConfigs: KeyConfig[]; // danh sách tất cả các key đã cấu hình
+}
+export type ExportPayload = {
+  layout: KeyboardSize;
+  kit: string | null;
+  keyConfigs: KeyConfig[];
 };
