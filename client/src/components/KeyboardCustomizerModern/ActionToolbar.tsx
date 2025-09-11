@@ -47,8 +47,8 @@ function ActionToolbarComponent({
               ? "Áp dụng: tất cả phím"
               : "Áp dụng: từng phím"
             : selectedGroup === "all"
-              ? "Áp dụng: tất cả phím"
-              : "Áp dụng: từng phím"}
+            ? "Áp dụng: tất cả phím"
+            : "Áp dụng: từng phím"}
         </span>
       </div>
 

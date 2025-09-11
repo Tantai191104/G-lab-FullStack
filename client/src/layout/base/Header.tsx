@@ -13,8 +13,6 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { logoutApi } from "@/services/authService";
-import { toast } from "react-toastify";
-
 const navItems = [
   { label: "Trang chủ", href: "/" },
   { label: "Giới thiệu", href: "#" },
@@ -47,17 +45,11 @@ function HeaderComponent() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const handleLogout = async () => {
-    try {
-      await logoutApi();
-      toast.success("Đăng xuất thành công");
-      logout();
-      setTimeout(() => {
-        window.location.href = "/auth/login";
-      }, 1200);
-    } catch (err) {
-      toast.error("Đăng xuất thất bại");
-      console.error(err);
-    }
+    await logoutApi();
+    logout();
+    setTimeout(() => {
+      window.location.href = "/auth/login";
+    }, 1200);
   };
 
   const scrollToContact = () => {
@@ -87,11 +79,15 @@ function HeaderComponent() {
         <div className="backdrop-blur-md bg-[#0B0B16]/50 border border-cyan-400/30 rounded-b-lg relative z-10">
           <div className="max-w-7xl mx-auto flex items-center justify-between px-8 py-6 gap-6">
             {/* Logo */}
-            {/* Logo */}
             <div
               className="flex items-center justify-center h-[48px] whitespace-nowrap"
               style={{ fontFamily: "Impact, Arial, sans-serif" }}
             >
+              <img
+                src="/avatar/avatar - GLab.jpg" // Đường dẫn tới logo, thay đổi nếu cần
+                alt="Logo"
+                className="h-10 w-10 mr-3 object-contain drop-shadow"
+              />
               <span className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-white to-blue-700 drop-shadow-[0_0_10px_rgba(0,0,0,0.8)]">
                 G-LAB
               </span>
@@ -110,7 +106,7 @@ function HeaderComponent() {
                     <button className="focus:outline-none cursor-pointer">
                       <Avatar>
                         <AvatarImage
-                          src={"https://github.com/shadcn.png"}
+                          src={"/avatar/avatar - GLab.jpg"}
                           alt={user.name || "avatar"}
                           className="object-cover"
                         />
@@ -154,11 +150,25 @@ function HeaderComponent() {
                   <button
                     type="button"
                     onClick={scrollToContact}
-                    className="flex items-center justify-center rounded-full bg-red-600 text-white hover:bg-red-700 transition px-2 py-1"
-                    style={{ height: 32, width: 32, minWidth: 32 }}
+                    className="group relative inline-flex items-center justify-center rounded-full bg-red-600 text-white hover:bg-red-700 px-2 py-1 cursor-pointer"
+                    style={{ height: 32, minWidth: 32 }}
                     aria-label="Hỗ Trợ"
                   >
-                    <HelpCircle size={18} />
+                    {/* Icon luôn ở trên */}
+                    <HelpCircle size={18} className="relative z-20" />
+
+                    {/* Text ẩn nhẹ phía sau và trượt ra từ trái sang phải */}
+                    <span
+                      className="absolute left-6 top-1/2 -translate-y-1/2 
+               -translate-x-4 opacity-0
+               group-hover:translate-x-0 group-hover:opacity-100
+               transition-transform duration-500 ease-out
+               text-white bg-red-600 px-3 py-1 rounded-r-full shadow-md whitespace-nowrap
+               z-10 pointer-events-none"
+                      style={{ fontSize: 14 }}
+                    >
+                      Hỗ trợ
+                    </span>
                   </button>
                 </>
               )}

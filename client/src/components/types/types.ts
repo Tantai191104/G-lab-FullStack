@@ -6,6 +6,7 @@ export type Keycap = {
   profile?: string;
   material?: string;
   price?: string;
+  isFalse: boolean;
 };
 
 export type SwitchItem = {
@@ -16,6 +17,7 @@ export type SwitchItem = {
   travel?: string;
   durability?: string;
   price?: string;
+  isFalse: boolean;
 };
 export type KeyGroups = Record<string, string[]>;
 export type KeyboardSize = "60" | "80" | "full";
