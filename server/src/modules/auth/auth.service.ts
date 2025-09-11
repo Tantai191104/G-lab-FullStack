@@ -58,7 +58,7 @@ export class AuthService {
    * Đăng ký user mới
    */
   async signup(createUserDto: CreateUserDto) {
-    const { email, password, name, address } = createUserDto;
+    const { email, password, name, address, phoneNumber } = createUserDto;
 
     const existingUser = await this.usersService.findByEmail(email);
     if (existingUser) {
@@ -73,6 +73,7 @@ export class AuthService {
       name,
       password: passwordHash,
       address,
+      phoneNumber,
       emailVerificationToken: emailToken,
       isEmailVerified: false,
     });
