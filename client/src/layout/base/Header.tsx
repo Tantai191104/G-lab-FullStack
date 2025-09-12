@@ -96,7 +96,7 @@ function HeaderComponent() {
                   textShadow: "0 0 10px rgba(0,0,0,0.8)",
                   transition: "text-shadow 0.3s",
                 }}
-                className="group-hover:text-shadow-[0_0_20px_#22D3EE]"
+                className="group-hover:text-shadow-[0_0_20px_#22D3EE] hidden custom-1300:inline"
               >
                 G-LAB
               </span>
@@ -158,7 +158,7 @@ function HeaderComponent() {
                   <button
                     type="button"
                     onClick={scrollToContact}
-                    className="group relative inline-flex items-center justify-center rounded-full bg-red-700 text-white hover:bg-blue-900 transition-all px-2 py-1 cursor-pointer shadow-md hover:shadow-[0_0_12px_#22D3EE]"
+                    className="group relative inline-flex items-center justify-center rounded-full bg-red-700 text-white hover: transition-all px-2 py-1 cursor-pointer shadow-md hover:shadow-[0_0_12px_#22D3EE]"
                     style={{ height: 32, minWidth: 32 }}
                     aria-label="Hỗ Trợ"
                   >

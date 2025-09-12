@@ -10,6 +10,7 @@ import VerifyEmailPage from "./pages/auth/VerifyEmailPage";
 import { Toaster } from "sonner";
 import AdminLayout from "./layout/AdminLayout";
 import UserManage from "./pages/admin/user/UserManage";
+import SwitchManage from "./pages/admin/switches/SwitchManage";
 
 export default function App() {
   return (
@@ -33,7 +34,8 @@ export default function App() {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route element={<ProtectedRoute />}></Route>
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<UserManage />} />
+            <Route path="users" element={<UserManage />} />
+            <Route path="switches" element={<SwitchManage />} />
           </Route>
           {/* Không có layout */}
           <Route path="*" element={<NotFoundPage />} />
