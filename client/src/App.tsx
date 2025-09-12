@@ -3,12 +3,14 @@ import HomePage from "./pages/Home/HomePage";
 import NotFoundPage from "./components/common/Error/NotFoundPage";
 import BaseLayout from "./layout/BaseLayout";
 import KeyboardCustomizerModern from "./components/KeyboardCustomizerModern/KeyboardCustomizerModern";
-import "react-toastify/dist/ReactToastify.css";
 import AuthPage from "./pages/auth/AuthPage";
 import AuthLayout from "./layout/AuthLayout";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import VerifyEmailPage from "./pages/auth/VerifyEmailPage";
 import { Toaster } from "sonner";
+import AdminLayout from "./layout/AdminLayout";
+import UserManage from "./pages/admin/user/UserManage";
+
 export default function App() {
   return (
     <>
@@ -30,6 +32,9 @@ export default function App() {
           </Route>
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route element={<ProtectedRoute />}></Route>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<UserManage />} />
+          </Route>
           {/* Không có layout */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

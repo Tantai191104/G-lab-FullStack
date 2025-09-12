@@ -7,6 +7,7 @@ module.exports = {
         header: ["Montserrat", "sans-serif"], // logo, headings
         body: ["Montserrat", "sans-serif"], // nội dung
         pacifico: ["Pacifico", "cursive"], // artistic
+        amuro: ["Amuro", "sans-serif"], // custom font
       },
       letterSpacing: {
         widest: "0.25em",

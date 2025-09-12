@@ -177,3 +177,30 @@
     transform: translateY(0);
   }
 }
+@font-face {
+  font-family: "Amuro";
+  src: url("/fonts/Amuro-82yn.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Amuro";
+  src: url("/fonts/Amuro-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Amuro";
+  src: url("/fonts/AmuroItalic-wWx6.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Amuro";
+  src: url("/fonts/AmuroBoldItalic-rWaB.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+}

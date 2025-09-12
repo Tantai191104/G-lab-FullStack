@@ -179,18 +179,11 @@ export default function ContactForm() {
                     >
                       <Select
                         placeholder="Chọn danh mục liên hệ"
-                        bordered={false}
                         className="custom-select"
                         style={{
                           width: "100%",
                           background: "transparent",
                           color: "#FFFFFF",
-                        }}
-                        dropdownStyle={{
-                          backgroundColor: "#1a1a1a",
-                          color: "#FFFFFF",
-                          borderRadius: "12px",
-                          border: "1px solid rgba(34, 211, 238, 0.3)",
                         }}
                       >
                         <Select.Option value="Chung">Chung</Select.Option>
@@ -236,7 +229,6 @@ export default function ContactForm() {
                           </div>
                           <Input
                             placeholder={item.placeholder}
-                            bordered={false}
                             className="custom-input"
                             style={{
                               width: "100%",
@@ -271,7 +263,6 @@ export default function ContactForm() {
                         </div>
                         <Input.TextArea
                           placeholder="Nội dung tin nhắn"
-                          bordered={false}
                           autoSize={{ minRows: 4, maxRows: 6 }}
                           className="custom-textarea"
                           style={{
@@ -333,28 +324,6 @@ export default function ContactForm() {
       </div>
 
       {/* Custom styles for form elements */}
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-                    .custom-input:focus,
-                    .custom-textarea:focus,
-                    .custom-select:focus {
-                        border-color: #22D3EE !important;
-                        box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2) !important;
-                    }
-                    
-                    .custom-input:hover,
-                    .custom-textarea:hover,
-                    .custom-select:hover {
-                        border-color: rgba(34, 211, 238, 0.5) !important;
-                    }
-                    
-                    .custom-submit-btn:hover {
-                        background: linear-gradient(135deg, #67E8F9 0%, #A78BFA 100%) !important;
-                    }
-                `,
-        }}
-      />
     </ConfigProvider>
   );
 }

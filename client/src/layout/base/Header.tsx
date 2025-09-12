@@ -79,23 +79,32 @@ function HeaderComponent() {
         <div className="backdrop-blur-md bg-[#0B0B16]/50 border border-cyan-400/30 rounded-b-lg relative z-10">
           <div className="max-w-7xl mx-auto flex items-center justify-between px-8 py-6 gap-6">
             {/* Logo */}
-            <div
-              className="flex items-center justify-center h-[48px] whitespace-nowrap"
-              style={{ fontFamily: "Impact, Arial, sans-serif" }}
-            >
+            <div className="flex items-center justify-center h-[48px] whitespace-nowrap group">
               <img
-                src="/avatar/avatar - GLab.jpg" // Đường dẫn tới logo, thay đổi nếu cần
+                src="/avatar/avatar - GLab.jpg"
                 alt="Logo"
-                className="h-10 w-10 mr-3 object-contain drop-shadow"
+                className="h-10 w-10 mr-3 object-contain drop-shadow transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_20px_#22D3EE]"
               />
-              <span className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-white to-blue-700 drop-shadow-[0_0_10px_rgba(0,0,0,0.8)]">
+              <span
+                style={{
+                  fontFamily: "Amuro, sans-serif",
+                  fontWeight: 400,
+                  fontSize: "2.5rem",
+                  background: "linear-gradient(to right, red, white, blue)",
+                  WebkitBackgroundClip: "text",
+                  color: "transparent",
+                  textShadow: "0 0 10px rgba(0,0,0,0.8)",
+                  transition: "text-shadow 0.3s",
+                }}
+                className="group-hover:text-shadow-[0_0_20px_#22D3EE]"
+              >
                 G-LAB
               </span>
             </div>
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-6 w-full justify-center">
-              <nav className="flex items-center gap-6">
+              <nav className="flex items-center gap-6 text-base font-semibold">
                 <MemoGooeyNav pathname={pathname} />
               </nav>
             </div>
@@ -137,34 +146,32 @@ function HeaderComponent() {
               ) : (
                 <>
                   <Link to="/auth/register">
-                    <Button className="bg-gradient-to-r from-cyan-400 to-purple-500 text-black hover:from-cyan-300 hover:to-purple-400 transition rounded-full px-5 py-2">
+                    <Button className="bg-gradient-to-r from-red-700 via-white to-blue-900 text-black hover:from-red-600 hover:to-blue-700 transition rounded-full px-5 py-2 font-bold shadow-md cursor-pointer hover:scale-105 hover:shadow-lg duration-200">
                       Đăng ký
                     </Button>
                   </Link>
                   <Link to="/auth/login">
-                    <Button className="border border-white/20 text-white bg-transparent hover:bg-white/10 transition rounded-full px-5 py-2">
+                    <Button className="border border-blue-900 text-blue-900 bg-white hover:bg-blue-900 hover:text-white transition rounded-full px-5 py-2 font-bold shadow-md cursor-pointer hover:scale-105 hover:shadow-lg duration-200">
                       Đăng nhập
                     </Button>
                   </Link>
-                  {/* Nút hỗ trợ nhỏ có icon */}
                   <button
                     type="button"
                     onClick={scrollToContact}
-                    className="group relative inline-flex items-center justify-center rounded-full bg-red-600 text-white hover:bg-red-700 px-2 py-1 cursor-pointer"
+                    className="group relative inline-flex items-center justify-center rounded-full bg-red-700 text-white hover:bg-blue-900 transition-all px-2 py-1 cursor-pointer shadow-md hover:shadow-[0_0_12px_#22D3EE]"
                     style={{ height: 32, minWidth: 32 }}
                     aria-label="Hỗ Trợ"
                   >
-                    {/* Icon luôn ở trên */}
-                    <HelpCircle size={18} className="relative z-20" />
-
-                    {/* Text ẩn nhẹ phía sau và trượt ra từ trái sang phải */}
+                    <HelpCircle
+                      size={18}
+                      className="relative z-20 transition-transform duration-300 group-hover:scale-110"
+                    />
                     <span
-                      className="absolute left-6 top-1/2 -translate-y-1/2 
-               -translate-x-4 opacity-0
-               group-hover:translate-x-0 group-hover:opacity-100
-               transition-transform duration-500 ease-out
-               text-white bg-red-600 px-3 py-1 rounded-r-full shadow-md whitespace-nowrap
-               z-10 pointer-events-none"
+                      className="absolute left-6 top-1/2 -translate-y-1/2 -translate-x-4 opacity-0
+              group-hover:translate-x-0 group-hover:opacity-100
+              transition-transform duration-500 ease-out
+              text-white bg-red-700 px-3 py-1 rounded-r-full shadow-md whitespace-nowrap
+              z-10 pointer-events-none"
                       style={{ fontSize: 14 }}
                     >
                       Hỗ trợ

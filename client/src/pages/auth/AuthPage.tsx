@@ -12,10 +12,6 @@ import { useLogin, useRegister } from "@/hooks/useAuth";
 const AuthPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [houseNumber, setHouseNumber] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedWard, setSelectedWard] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const urlMode = location.pathname.includes("register") ? "register" : "login";
@@ -42,27 +38,34 @@ const AuthPage: React.FC = () => {
       }
     );
   };
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleRegister = async (data: {
+    name: string;
+    email: string;
+    phone: string;
+    password: string;
+    confirmPassword: string;
+    houseNumber: string;
+    selectedCity: string;
+    selectedWard: string;
+  }) => {
     // Tìm city và ward theo code
-    const cityObj = cities.find((c) => c.code === selectedCity);
+    const cityObj = cities.find((c) => c.code === data.selectedCity);
     const wardObj = wards.find(
-      (w) => w.code === selectedWard && w.parent_code === selectedCity
+      (w) => w.code === data.selectedWard && w.parent_code === data.selectedCity
     );
 
     const cityName = cityObj?.name || "";
     const wardName = wardObj?.name || "";
 
-    const address = `${houseNumber}, ${wardName}, ${cityName}`;
+    const address = `${data.houseNumber}, ${wardName}, ${cityName}`;
     console.log("Full Address:", address);
 
     // Gọi mutation register
     registerMutation.mutate(
       {
-        name,
-        email,
-        password,
+        name: data.name,
+        email: data.email,
+        password: data.password,
         address: [address],
       },
       {
@@ -91,7 +94,7 @@ const AuthPage: React.FC = () => {
       </button>
 
       <motion.img
-        src="/login-bg.png"
+        src="/avatar/signatureKeycaps.jpg"
         alt="bg"
         className="absolute w-4/5 h-4/5 object-cover object-center z-0 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl shadow-2xl"
         key={mode}
@@ -122,18 +125,6 @@ const AuthPage: React.FC = () => {
               exit="exit"
             >
               <RegisterForm
-                name={name}
-                setName={setName}
-                email={email}
-                setEmail={setEmail}
-                password={password}
-                setPassword={setPassword}
-                houseNumber={houseNumber}
-                setHouseNumber={setHouseNumber}
-                selectedCity={selectedCity}
-                setSelectedCity={setSelectedCity}
-                selectedWard={selectedWard}
-                setSelectedWard={setSelectedWard}
                 loading={registerMutation.isPending}
                 handleRegister={handleRegister}
                 setMode={setMode}

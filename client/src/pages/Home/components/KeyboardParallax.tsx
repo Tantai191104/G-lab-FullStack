@@ -100,7 +100,8 @@ const KeyboardParallax: React.FC = () => {
   useEffect(() => {
     refs.current.forEach((ref) => {
       if (!ref) return;
-      ref.style.transition = "transform 400ms cubic-bezier(0.22, 1, 0.36, 1), opacity 400ms ease-out";
+      ref.style.transition =
+        "transform 400ms cubic-bezier(0.22, 1, 0.36, 1), opacity 400ms ease-out";
       ref.style.willChange = "transform, opacity";
     });
   }, []);
@@ -111,7 +112,9 @@ const KeyboardParallax: React.FC = () => {
     refs.current.forEach((ref) => {
       if (!ref) return;
       const rect = ref.getBoundingClientRect();
-      const distanceToCenter = Math.abs(rect.top + rect.height / 2 - windowHeight / 2);
+      const distanceToCenter = Math.abs(
+        rect.top + rect.height / 2 - windowHeight / 2
+      );
       const maxDistance = windowHeight / 2 + rect.height / 2;
       const progress = Math.min(distanceToCenter / maxDistance, 1);
       // scale và opacity nhẹ hơn + easing để mượt
@@ -189,9 +192,9 @@ const KeyboardParallax: React.FC = () => {
             // Paint containment helps isolate cost per section
             contain: "content",
             // Use content-visibility to skip offscreen paint/layout
-            contentVisibility: "auto" as any,
+            contentVisibility: "auto",
             // Provide intrinsic size hint to avoid layout jumps when skipping rendering
-            containIntrinsicSize: "1000px 800px" as any,
+            containIntrinsicSize: "1000px 800px",
           }}
         >
           {/* Gundam Shapes riêng cho mỗi slide */}
@@ -226,7 +229,12 @@ const KeyboardParallax: React.FC = () => {
             className="flex-1 text-white space-y-8 max-w-2xl relative z-10"
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
-            transition={{ type: "spring", stiffness: 80, damping: 20, mass: 0.8 }}
+            transition={{
+              type: "spring",
+              stiffness: 80,
+              damping: 20,
+              mass: 0.8,
+            }}
             viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
           >
             <h2 className="text-6xl md:text-7xl font-header font-extrabold leading-tight tracking-tight drop-shadow-lg">
@@ -234,13 +242,20 @@ const KeyboardParallax: React.FC = () => {
             </h2>
 
             <p className="opacity-90 font-body text-xl md:text-2xl max-w-lg leading-relaxed">
-              Khám phá <span className="font-semibold">{kb.name}</span> — bàn phím cơ mang lại trải nghiệm gõ mượt mà, thiết kế tinh tế, và phong cách độc đáo.
+              Khám phá <span className="font-semibold">{kb.name}</span> — bàn
+              phím cơ mang lại trải nghiệm gõ mượt mà, thiết kế tinh tế, và
+              phong cách độc đáo.
             </p>
 
             <motion.button
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.4 }}
+              transition={{
+                type: "spring",
+                stiffness: 300,
+                damping: 20,
+                mass: 0.4,
+              }}
               className="flex items-center justify-center rounded-[62px] bg-white text-black px-10 py-3 font-body text-sm md:text-base w-[220px] h-[48px] font-semibold shadow-xl"
             >
               Mua Ngay
@@ -274,7 +289,11 @@ const KeyboardParallax: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.96 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
                 viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
                 loading="lazy"
                 decoding="async"

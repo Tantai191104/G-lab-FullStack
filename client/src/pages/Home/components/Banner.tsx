@@ -41,7 +41,7 @@ export default function Banner({ title, categories }: BannerProps) {
                                 <img
                                     src={cat.image}
                                     alt={cat.name}
-                                    className="w-full h-full object-cover transform group-hover:scale-110 transition duration-700 ease-out"
+                                    className="w-full h-full object-contain transform group-hover:scale-110 transition duration-700 ease-out"
                                     loading="lazy"
                                     decoding="async"
                                 />

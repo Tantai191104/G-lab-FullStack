@@ -1,15 +1,17 @@
 export type User = {
   _id: string;
   email: string;
-  password: string;
   name: string;
   address: string[];
+  phone: string;
   role: "customer" | "admin" | string;
   status: "active" | "inactive" | string;
   isEmailVerified: boolean;
   emailVerificationToken: string | null;
   createdAt: string;
   updatedAt: string;
+  updatedBy?: string | null;
+  reasonForBan?: string | null;
 };
 
 export type Ward = {

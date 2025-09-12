@@ -40,7 +40,7 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
   const getXY = (
     distance: number,
     pointIndex: number,
-    totalPoints: number,  
+    totalPoints: number
   ): [number, number] => {
     const angle =
       ((360 + noise(8)) / totalPoints) * pointIndex * (Math.PI / 180);
@@ -50,7 +50,7 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
     i: number,
     t: number,
     d: [number, number],
-    r: number,
+    r: number
   ) => {
     let rotate = noise(r / 10);
     return {
@@ -92,7 +92,7 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
         setTimeout(() => {
           try {
             element.removeChild(particle);
-          } catch { }
+          } catch {}
         }, t);
       }, 30);
     }
@@ -113,7 +113,7 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
   };
   const handleClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    index: number,
+    index: number
   ) => {
     const liEl = e.currentTarget;
     if (activeIndex === index) return;
@@ -134,7 +134,7 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
   };
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLAnchorElement>,
-    index: number,
+    index: number
   ) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -144,7 +144,7 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
           {
             currentTarget: liEl,
           } as React.MouseEvent<HTMLAnchorElement>,
-          index,
+          index
         );
       }
     }
@@ -327,14 +327,17 @@ const GooeyNav: React.FC<GooeyNavProps> = ({
             {items.map((item, index) => (
               <li
                 key={index}
-                className={`rounded-full relative cursor-pointer transition-[background-color_color_box-shadow] duration-300 ease shadow-[0_0_0.5px_1.5px_transparent] text-white ${activeIndex === index ? "active" : ""
-                  }`}
+                className={`rounded-full relative cursor-pointer transition-[background-color_color_box-shadow] duration-300 ease shadow-[0_0_0.5px_1.5px_transparent] text-white ${
+                  activeIndex === index ? "active" : ""
+                }`}
+                style={{ minWidth: "110px", textAlign: "center" }} // Thêm minWidth và textAlign
               >
                 <a
                   href={item.href}
                   onClick={(e) => handleClick(e, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="outline-none py-[0.6em] px-[1em] inline-block"
+                  className="outline-none py-2 px-3 inline-block whitespace-nowrap" // Sửa padding và thêm whitespace-nowrap
+                  style={{ fontSize: "1rem" }} // Giảm size nếu cần
                 >
                   {item.label}
                 </a>

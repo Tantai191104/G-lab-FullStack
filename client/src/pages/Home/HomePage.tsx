@@ -11,7 +11,7 @@ import HotSwitchsGrid from "./components/HotSwitchsGrid";
 
 export default function HomePage() {
   return (
-    <div className="w-full bg-gradient-to-b from-gray-900 via-black to-gray-900">
+    <div className="w-full ">
       {/* Hero Section */}
       <KeyboardParallax />
       <HorizontalLoopText text="LAB FOR KEYS" speed={20} />
@@ -27,8 +27,7 @@ export default function HomePage() {
           },
           {
             name: "Keycaps",
-            image:
-              "https://i.pinimg.com/736x/ee/10/ac/ee10ac7d58a37c3228ae33985f9db1ad.jpg",
+            image: "/avatar/signatureKeycaps.jpg",
           },
           {
             name: "Switchs",
