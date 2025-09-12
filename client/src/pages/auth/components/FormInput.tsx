@@ -7,10 +7,10 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export default function FormInput({ icon, className = "", ...props }: FormInputProps) {
   return (
-    <div className={`grid grid-cols-[1fr_max-content] items-center gap-3 border-2 border-white/70 px-5 rounded-full bg-white/10 ${className}`}>
+    <div className={`grid grid-cols-[1fr_max-content] items-center gap-3 border-2 border-black/30 px-5 rounded-full bg-black/5 ${className}`}>
       <input
         {...props}
-        className="w-full bg-transparent text-white py-3 placeholder:text-blue-300 focus:outline-none"
+        className="w-full bg-transparent text-black py-3 placeholder:text-gray-500 focus:outline-none"
       />
       {icon}
     </div>

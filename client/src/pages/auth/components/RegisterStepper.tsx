@@ -25,19 +25,19 @@ const RegisterStepper: FC<Props> = ({ activeIndex, setActiveIndex }) => {
               className={`rounded-full border-2 flex items-center justify-center transition-all duration-200
                 ${
                   activeIndex === idx
-                    ? "bg-gradient-to-tr from-blue-700 to-blue-500 border-white text-white shadow-lg scale-110"
-                    : "bg-white border-blue-700 text-blue-700"
+                    ? "bg-black/80 border-white text-white shadow-lg scale-110"
+                    : "bg-white border-black/40 text-black/70"
                 }
                 w-12 h-12 text-xl font-bold`}>
               {item.icon}
             </button>
             <span
               className={`mt-2 text-base font-bold transition-all duration-200
-                ${activeIndex === idx ? "text-white drop-shadow" : "text-blue-700"}`}>
+                ${activeIndex === idx ? "text-black drop-shadow" : "text-black/70"}`}>
               {item.label}
             </span>
             {idx < items.length - 1 && (
-              <div className="w-12 h-1 bg-gradient-to-r from-blue-700 to-transparent mt-2" />
+              <div className="w-12 h-1 bg-black/30 mt-2" />
             )}
           </div>
         ))}

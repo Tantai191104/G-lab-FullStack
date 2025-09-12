@@ -82,7 +82,7 @@ export default function KeyboardSlider() {
 			</div>
 			<div className="flex justify-center mt-12">
 				<button
-					className="px-8 py-4 rounded-2xl shadow-xl border border-white/10 bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 text-black font-semibold hover:scale-105 transition-transform duration-300 max-w-[220px] max-h-[60px] w-full text-center text-[16px]"
+					className="px-8 py-4 rounded-2xl shadow-xl border-2 border-[#F4BB19]/30 bg-gradient-to-r from-[#0A92CC]/30 via-[#F4BB19]/30 to-[#ED2B52]/30 text-white font-semibold hover:scale-105 transition-transform duration-300 max-w-[220px] max-h-[60px] w-full text-center text-[16px] drop-shadow-[0_2px_8px_#AE214A] hover:bg-gradient-to-r hover:from-[#F4BB19]/50 hover:to-[#AE214A]/50"
 				>
 					Tìm hiểu thêm
 				</button>

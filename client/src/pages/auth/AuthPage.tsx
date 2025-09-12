@@ -86,7 +86,7 @@ const AuthPage: React.FC = () => {
     <div className="min-h-screen w-screen flex items-center justify-center relative overflow-hidden">
       {/* Nút trở về trang chủ */}
       <button
-        className="absolute top-8 left-8 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 hover:bg-white text-purple-700 font-semibold shadow-lg transition-all cursor-pointer"
+        className="absolute top-8 left-8 z-20 flex items-center gap-2 px-5 py-2 rounded-full bg-gradient-to-r from-[#0A92CC] to-[#F4BB19] text-white font-bold shadow-lg hover:brightness-110 hover:shadow-[0_0_12px_#0A92CC] transition-all duration-200 border-2 border-[#0A92CC]"
         onClick={() => navigate("/")}
       >
         <FiArrowLeft className="text-xl" />

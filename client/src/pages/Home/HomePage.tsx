@@ -98,64 +98,43 @@ export default function HomePage() {
       </div>
 
       {/* Call to Action Section */}
-      <section className="max-w-6xl mx-auto my-20 px-6">
-        <div className="relative max-w-3xl mx-auto group">
-          {/* Background glow */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/30 via-blue-500/20 to-purple-500/30 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-700"></div>
-
-          {/* Main container */}
-          <div className="relative bg-gradient-to-br from-gray-800/40 via-gray-900/60 to-gray-800/40 backdrop-blur-xl border border-cyan-400/20 rounded-3xl p-10 shadow-2xl group-hover:border-cyan-400/40 transition-all duration-500">
-            {/* Top decoration */}
-            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-              <div className="w-6 h-6 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full shadow-lg"></div>
-            </div>
-
-            {/* Top line */}
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent mb-8 opacity-60"></div>
-
-            {/* Content */}
-            <div className="text-center">
-              <h3 className="text-2xl font-bold text-white mb-4">
-                Sẵn sàng khám phá?
-              </h3>
-
-              <a
-                href="#"
-                className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 text-black font-bold text-lg rounded-2xl shadow-lg hover:shadow-2xl transform hover:scale-105 hover:-translate-y-1 transition-all duration-300 group/btn relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-                <span className="relative z-10 flex items-center gap-2">
-                  Trải nghiệm ngay
-                  <svg
-                    className="w-5 h-5 transform group-hover/btn:translate-x-1 transition-transform duration-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
-                </span>
-              </a>
-
-              <p className="text-gray-400 mt-4 text-sm">
-                Khám phá bộ sưu tập phím custom độc đáo
-              </p>
-            </div>
-
-            {/* Bottom line */}
-            <div className="w-full h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent mt-8 opacity-60"></div>
-
-            {/* Corner decorations */}
-            <div className="absolute top-4 left-4 w-2 h-2 bg-cyan-400/60 rounded-full"></div>
-            <div className="absolute top-4 right-4 w-2 h-2 bg-blue-400/60 rounded-full"></div>
-            <div className="absolute bottom-4 left-4 w-2 h-2 bg-blue-400/60 rounded-full"></div>
-            <div className="absolute bottom-4 right-4 w-2 h-2 bg-purple-500/60 rounded-full"></div>
+      <section className="max-w-4xl mx-auto my-20 px-4">
+        <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-black/90 via-gray-900/95 to-gray-800/90 border border-white/10 backdrop-blur-xl p-10 flex flex-col items-center gap-6">
+          {/* Soft glow accent */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute left-1/2 top-0 -translate-x-1/2 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
+            <div className="absolute right-0 bottom-0 w-32 h-32 bg-black/10 rounded-full blur-2xl"></div>
           </div>
+          <h3 className="text-3xl md:text-4xl font-black text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.08)] text-center">
+            Sẵn sàng khám phá?
+          </h3>
+          <a
+            href="#"
+            className="inline-flex items-center gap-3 px-8 py-3 rounded-2xl font-bold text-base md:text-lg bg-gradient-to-r from-black/90 via-gray-700/80 to-white/10 text-white shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 border border-white/10 relative"
+            style={{ boxShadow: "0 2px 16px 0 rgba(0,0,0,0.18), 0 0px 0px 0 rgba(255,255,255,0.08)" }}
+          >
+            <span className="flex items-center gap-2">
+              Trải nghiệm ngay
+              <svg
+                className="w-5 h-5 transition-transform duration-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+            </span>
+            {/* Button glow accent */}
+            <span className="absolute inset-0 pointer-events-none rounded-2xl bg-gradient-to-r from-white/5 via-black/0 to-white/5 opacity-0 hover:opacity-100 transition-opacity duration-300"></span>
+          </a>
+          <p className="text-gray-300 text-sm text-center">
+            Khám phá bộ sưu tập phím custom độc đáo
+          </p>
         </div>
       </section>
 

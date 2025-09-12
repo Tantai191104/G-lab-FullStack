@@ -12,7 +12,9 @@ interface Keyboard {
   switches: string;
   connectivity: string;
   layout: string;
-  backgroundColor: string;
+  backgroundStyle: string;
+  glowColor: string;
+  shapesColor: string[];
 }
 
 const keyboards: Keyboard[] = [
@@ -26,7 +28,10 @@ const keyboards: Keyboard[] = [
     switches: "Gateron Red / Brown / Blue",
     connectivity: "Bluetooth 5.1 / USB-C",
     layout: "75% layout",
-    backgroundColor: "#1a1a1a",
+    backgroundStyle:
+      "linear-gradient(135deg, #0A92CC, #F4BB19 50%, #AE214A 100%)",
+    glowColor: "#0A92CC",
+    shapesColor: ["#0A92CC", "#F4BB19", "#AE214A", "#ED2B52"],
   },
   {
     name: "Ducky One 2 Mini",
@@ -38,7 +43,10 @@ const keyboards: Keyboard[] = [
     switches: "Cherry MX Red / Brown / Blue",
     connectivity: "USB-C",
     layout: "60% layout",
-    backgroundColor: "#fdd835",
+    backgroundStyle:
+      "linear-gradient(120deg, #ED2B52, #F4BB19 40%, #AE214A 100%)",
+    glowColor: "#ED2B52",
+    shapesColor: ["#ED2B52", "#F4BB19", "#0A92CC", "#AE214A"],
   },
   {
     name: "Akko 3068",
@@ -50,7 +58,10 @@ const keyboards: Keyboard[] = [
     switches: "Akko CS / Gateron",
     connectivity: "USB-C / Bluetooth 5.0",
     layout: "65% layout (68 keys)",
-    backgroundColor: "#24243e",
+    backgroundStyle:
+      "linear-gradient(135deg, #AE214A, #ED2B52 50%, #0A92CC 100%)",
+    glowColor: "#AE214A",
+    shapesColor: ["#AE214A", "#ED2B52", "#F4BB19", "#0A92CC"],
   },
 ];
 
@@ -158,23 +169,24 @@ const KeyboardParallax: React.FC = () => {
         const dx = Math.sin(a1 + slideIdx) * 12;
         const dy = Math.cos(a1 + slideIdx) * 12;
         glow.style.transform = `translate(${dx}px, ${dy}px) scale(1.12)`;
-        glow.style.background = `radial-gradient(circle, ${keyboards[slideIdx].backgroundColor}70 0%, transparent 70%)`;
+        glow.style.background = `radial-gradient(circle, ${keyboards[slideIdx].glowColor}70 0%, transparent 70%)`;
         glow.style.opacity = "0.42";
         glow.style.willChange = "transform, opacity";
       }
 
       // Animate only shapes that belong to this slide
       const base = slideIdx * shapes.length;
-      for (let i = 0; i < shapes.length; i += 1) {
+      const kb = keyboards[slideIdx];
+      for (let i = 0; i < shapes.length; i++) {
         const shape = shapeRefs.current[base + i];
         if (!shape) continue;
         const ty = Math.sin(a2 + i) * 10;
         const rot = (t / 6500) % 360;
         shape.style.transform = `translateY(${ty}px) rotate(${rot}deg)`;
-        shape.style.willChange = "transform";
+        shape.style.background = kb.shapesColor[i % kb.shapesColor.length]; // manga style color
       }
     });
-  });
+  }); // <-- Close useAnimationFrame callback here
 
   return (
     <section className="relative w-full overflow-hidden">
@@ -186,17 +198,24 @@ const KeyboardParallax: React.FC = () => {
           }}
           className="flex flex-col md:flex-row items-center justify-between min-h-screen w-full px-8 md:px-20 relative transition-transform duration-300 ease-out"
           style={{
-            background: `linear-gradient(135deg, ${kb.backgroundColor}, #000000)`,
-            // Fixed backgrounds cause repaint/reflow issues on mobile; keep scroll for perf
+            background: keyboards[slideIdx].backgroundStyle,
             backgroundAttachment: "scroll",
-            // Paint containment helps isolate cost per section
             contain: "content",
-            // Use content-visibility to skip offscreen paint/layout
             contentVisibility: "auto",
-            // Provide intrinsic size hint to avoid layout jumps when skipping rendering
             containIntrinsicSize: "1000px 800px",
           }}
         >
+          {" "}
+          <div
+            ref={(el) => {
+              if (el) glowRefs.current[slideIdx] = el;
+            }}
+            className="absolute inset-0 blur-3xl mix-blend-screen will-change-transform"
+            style={{
+              background: `radial-gradient(circle, ${keyboards[slideIdx].glowColor}70 0%, transparent 70%)`,
+              opacity: 0.42,
+            }}
+          />
           {/* Gundam Shapes riêng cho mỗi slide */}
           {shapes.map((s, shapeIdx) => {
             const globalIdx = slideIdx * shapes.length + shapeIdx;
@@ -221,9 +240,7 @@ const KeyboardParallax: React.FC = () => {
               />
             );
           })}
-
           <div className="absolute inset-y-0 left-0 w-1/2 bg-black/40 backdrop-blur-sm z-0 pointer-events-none" />
-
           {/* Left Content */}
           <motion.div
             className="flex-1 text-white space-y-8 max-w-2xl relative z-10"
@@ -278,21 +295,18 @@ const KeyboardParallax: React.FC = () => {
               </div>
             </div>
           </motion.div>
-
           {/* Right Image */}
           <div className="flex-1 flex justify-center items-center relative">
             {kb.image && (
               <motion.img
                 src={kb.image}
                 alt={kb.name}
-                className="h-[65vh] md:h-[80vh] object-contain drop-shadow-2xl relative z-10 will-change-transform"
-                initial={{ opacity: 0, scale: 0.96 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                animate={{ y: [0, -8, 0] }}
+                className="h-[65vh] md:h-[80vh] object-contain drop-shadow-2xl relative z-10 will-change-transform md:translate-x-16 translate-x-6"
+                initial={{ opacity: 0, scale: 0.96, x: 40 }}
+                whileInView={{ opacity: 1, scale: 1, x: 0 }}
                 transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "easeInOut",
+                  duration: 1.2,
+                  ease: "easeOut",
                 }}
                 viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
                 loading="lazy"

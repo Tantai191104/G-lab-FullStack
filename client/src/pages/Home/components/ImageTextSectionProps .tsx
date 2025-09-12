@@ -80,7 +80,21 @@ export default function ImageTextSection({
         <p className="text-gray-300/90 text-base md:text-lg mb-6 md:mb-8 leading-relaxed">
           {description}
         </p>
-        <button className="mx-auto md:mx-0 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 text-black px-8 md:px-10 py-3 md:py-3 font-semibold text-sm md:text-base shadow-xl transition-transform duration-200 hover:scale-105">
+        {/* Button restyled for gentle black/white manga-inspired look */}
+        <style>{`
+            .gentle-manga-btn {
+              background: linear-gradient(90deg, rgba(30,30,30,0.92) 0%, rgba(255,255,255,0.12) 100%);
+              color: #f5f5f5;
+              box-shadow: 0 2px 16px 0 rgba(0,0,0,0.18), 0 0px 0px 0 rgba(255,255,255,0.08);
+              border: 1px solid rgba(255,255,255,0.08);
+            }
+            .gentle-manga-btn:hover {
+              background: linear-gradient(90deg, rgba(50,50,50,0.98) 0%, rgba(255,255,255,0.18) 100%);
+              color: #fff;
+              box-shadow: 0 4px 24px 0 rgba(0,0,0,0.22), 0 0px 0px 0 rgba(255,255,255,0.12);
+            }
+          `}</style>
+        <button className="gentle-manga-btn mx-auto md:mx-0 inline-flex items-center justify-center gap-2 rounded-2xl px-8 md:px-10 py-3 md:py-3 font-semibold text-sm md:text-base transition-transform duration-200 hover:scale-105">
           Tìm hiểu thêm
           <span className="inline-block translate-y-[1px]">→</span>
         </button>

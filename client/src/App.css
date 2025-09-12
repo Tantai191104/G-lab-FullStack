@@ -2,11 +2,7 @@
 .custom-1300 {
   display: none;
 }
-@media (min-width: 1300px) {
-  .custom-1300 {
-    display: inline;
-  }
-}
+
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";

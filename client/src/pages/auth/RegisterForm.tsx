@@ -79,7 +79,7 @@ export default function RegisterForm({
   };
 
   return (
-    <div className="p-6 bg-white/10 text-white rounded-2xl shadow-2xl w-full backdrop-blur-md">
+    <div className="bg-white/30 border border-black/20 p-10 text-black rounded-2xl shadow-2xl backdrop-blur-md">
       <RegisterStepper
         activeIndex={activeIndex}
         setActiveIndex={setActiveIndex}
@@ -138,7 +138,7 @@ export default function RegisterForm({
         Đã có tài khoản?{" "}
         <button
           type="button"
-          className="font-medium hover:underline text-blue-400"
+          className="font-medium hover:underline text-black"
           onClick={() => setMode("login")}
         >
           Đăng nhập

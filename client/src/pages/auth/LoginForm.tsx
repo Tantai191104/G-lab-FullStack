@@ -49,34 +49,34 @@ const LoginForm: React.FC<LoginFormProps> = ({
       initial="initial"
       animate="animate"
       exit="exit"
-      className="bg-white/5 border-2 border-white/70 p-10 text-white rounded-2xl shadow-2xl"
+      className="bg-white/30 border border-black/20 p-10 text-black rounded-2xl shadow-2xl backdrop-blur-md"
       onSubmit={handleLogin}
     >
-      <h1 className="text-center text-2xl md:text-3xl font-semibold mb-5">
-        Login
+      <h1 className="text-center text-2xl md:text-3xl font-extrabold mb-5 text-black drop-shadow-[0_2px_8px_rgba(0,0,0,0.10)]">
+        Đăng nhập
       </h1>
       <div className="grid gap-5 mb-4">
         {/* Email */}
-        <div className="grid grid-cols-[1fr_max-content] items-center gap-3 border-2 border-white/70 px-5 rounded-full">
+        <div className="grid grid-cols-[1fr_max-content] items-center gap-3 border-2 border-black/20 px-5 rounded-full bg-black/5">
           <input
             type="email"
-            className="w-full bg-transparent text-white py-4 placeholder:text-white focus:outline-none"
+            className="w-full bg-transparent text-black py-4 placeholder:text-gray-500 focus:outline-none"
             placeholder="Email ID"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
           />
-          <span className="text-xl text-white">
+          <span className="text-xl text-black/60">
             <FiMail />
           </span>
         </div>
 
         {/* Password */}
-        <div className="grid grid-cols-[1fr_32px_32px] items-center gap-3 border-2 border-white/70 px-5 rounded-full">
+        <div className="grid grid-cols-[1fr_32px_32px] items-center gap-3 border-2 border-black/20 px-5 rounded-full bg-black/5">
           <input
             type={showPassword ? "text" : "password"}
-            className="w-full bg-transparent text-white py-4 placeholder:text-white focus:outline-none"
+            className="w-full bg-transparent text-black py-4 placeholder:text-gray-500 focus:outline-none"
             placeholder="Mật khẩu"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -85,44 +85,44 @@ const LoginForm: React.FC<LoginFormProps> = ({
           />
           <button
             type="button"
-            className="text-xl text-white focus:outline-none"
+            className="text-xl text-black/60 focus:outline-none"
             onClick={() => setShowPassword((prev) => !prev)}
             tabIndex={-1}
             aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
           >
             {showPassword ? <FiEyeOff /> : <FiEye />}
           </button>
-          <span className="text-xl text-white">
+          <span className="text-xl text-black/60">
             <FiLock />
           </span>
         </div>
       </div>
 
       <div className="flex justify-between items-center mb-4 text-sm">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" className="accent-white" /> Remember me
+        <label className="flex items-center gap-2 cursor-pointer text-black/70">
+          <input type="checkbox" className="accent-black" /> Remember me
         </label>
-        <a href="#" className="text-white hover:underline">
-          Forgot Password?
+        <a href="#" className="text-black/70 hover:underline">
+          Quên mật khẩu?
         </a>
       </div>
 
       <button
         type="submit"
-        className="w-full py-4 mb-4 bg-white rounded-full text-black font-medium cursor-pointer text-lg shadow-lg"
+        className="w-full py-4 mb-4 bg-black/80 rounded-full text-white font-bold cursor-pointer text-lg shadow-lg border-2 border-black/80 hover:bg-black transition duration-200"
       >
         {loading ? (
-          <span className="animate-spin h-5 w-5 border-2 border-black border-t-transparent rounded-full inline-block"></span>
+          <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full inline-block"></span>
         ) : (
-          <>Login</>
+          <>Đăng nhập</>
         )}
       </button>
 
       <div className="text-sm text-center">
-        Bạn chưa có tài khoản?{" "}
+        <span className="text-black/70">Bạn chưa có tài khoản?</span>{" "}
         <button
           type="button"
-          className="font-medium hover:underline"
+          className="font-bold text-black hover:underline"
           onClick={() => setMode("register")}
         >
           Đăng ký ngay

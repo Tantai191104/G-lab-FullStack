@@ -47,18 +47,18 @@ export default function AddressStep({
 
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-white mb-1 ml-2">
+      <label className="block text-sm font-medium text-black mb-1 ml-2">
         Số nhà, Khu phố
       </label>
       <FormInput
-        icon={<FiMapPin className="text-xl" />}
+        icon={<FiMapPin className="text-xl text-black/60" />}
         value={houseNumber}
         onChange={(e) => setHouseNumber((e.target as HTMLInputElement).value)}
         placeholder="Số nhà , Khu phố"
         required
       />
 
-      <label className="block text-sm font-medium text-white mb-1 ml-2">
+      <label className="block text-sm font-medium text-black mb-1 ml-2">
         Thành phố
       </label>
       <Listbox
@@ -69,12 +69,12 @@ export default function AddressStep({
         }}
       >
         <div className="relative w-full">
-          <ListboxButton className="relative w-full cursor-pointer bg-white/10 border-2 border-white/70 text-white py-3 pl-5 pr-10 rounded-full text-left focus:outline-none">
+          <ListboxButton className="relative w-full cursor-pointer bg-black/5 border-2 border-black/30 text-black py-3 pl-5 pr-10 rounded-full text-left focus:outline-none">
             <span>
               {cities.find((c) => c.code === selectedCity)?.name ||
                 "Chọn thành phố"}
             </span>
-            <FaCity className="absolute right-4 top-1/2 -translate-y-1/2 text-white" />
+            <FaCity className="absolute right-4 top-1/2 -translate-y-1/2 text-black/60" />
           </ListboxButton>
           <Transition
             as={Fragment}
@@ -89,7 +89,7 @@ export default function AddressStep({
                   value={c.code}
                   className={({ selected }) =>
                     `cursor-pointer py-2 pl-5 pr-10 ${
-                      selected ? "bg-blue-500 font-semibold" : ""
+                      selected ? "bg-black/30 font-semibold text-black" : "text-black/80"}
                     }`
                   }
                 >
@@ -101,7 +101,7 @@ export default function AddressStep({
         </div>
       </Listbox>
 
-      <label className="block text-sm font-medium text-white mb-1 ml-2">
+      <label className="block text-sm font-medium text-black mb-1 ml-2">
         Phường/Xã
       </label>
       <Listbox
@@ -110,12 +110,12 @@ export default function AddressStep({
         disabled={!selectedCity}
       >
         <div className="relative w-full">
-          <ListboxButton className="relative w-full cursor-pointer bg-white/10 border-2 border-white/70 text-white py-3 pl-5 pr-10 rounded-full text-left focus:outline-none disabled:opacity-50">
+          <ListboxButton className="relative w-full cursor-pointer bg-black/5 border-2 border-black/30 text-black py-3 pl-5 pr-10 rounded-full text-left focus:outline-none disabled:opacity-50">
             <span>
               {wards.find((w) => w.code === selectedWard)?.name ||
                 "Chọn phường/xã"}
             </span>
-            <FiMapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-white" />
+            <FiMapPin className="absolute right-4 top-1/2 -translate-y-1/2 text-black/60" />
           </ListboxButton>
           <Transition
             as={Fragment}
@@ -130,7 +130,7 @@ export default function AddressStep({
                   value={w.code}
                   className={({ selected }) =>
                     `cursor-pointer py-2 pl-5 pr-10 ${
-                      selected ? "bg-blue-500 font-semibold" : ""
+                      selected ? "bg-black/30 font-semibold text-black" : "text-black/80"}
                     }`
                   }
                 >
@@ -145,14 +145,14 @@ export default function AddressStep({
       <div className="flex justify-between mt-2">
         <button
           type="button"
-          className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold px-6 py-2 rounded-full shadow transition-all"
+          className="flex items-center gap-2 bg-black/40 hover:bg-black text-white font-semibold px-6 py-2 rounded-full shadow transition-all border-2 border-black/40"
           onClick={() => setActiveIndex(0)}
         >
           <FaArrowLeft /> Quay lại
         </button>
         <button
           type="button"
-          className="flex items-center gap-2 bg-gradient-to-tr from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white font-semibold px-6 py-2 rounded-full shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 bg-black/80 hover:bg-black text-white font-semibold px-6 py-2 rounded-full shadow transition-all disabled:opacity-50 disabled:cursor-not-allowed border-2 border-black/80"
           onClick={() => setActiveIndex(2)}
           disabled={!houseNumber || !selectedCity || !selectedWard}
         >

@@ -77,38 +77,38 @@ function HeaderComponent() {
 
         {/* Main header container */}
         <div className="backdrop-blur-md bg-[#0B0B16]/50 border border-cyan-400/30 rounded-b-lg relative z-10">
-          <div className="max-w-7xl mx-auto flex items-center justify-between px-8 py-6 gap-6">
+          <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-6 gap-12">
             {/* Logo */}
-            <div className="flex items-center justify-center h-[48px] whitespace-nowrap group">
+            <div className="flex items-center justify-center h-[48px] whitespace-nowrap">
               <img
-                src="/avatar/avatar - GLab.jpg"
+                src="/avatar/logo.png"
                 alt="Logo"
-                className="h-10 w-10 mr-3 object-contain drop-shadow transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_20px_#22D3EE]"
+                className="h-20 w-20 xl:h-28 xl:w-28 2xl:h-36 2xl:w-36 mr-2 object-contain drop-shadow cursor-pointer transition-transform duration-300 group hover:scale-110 hover:drop-shadow-[0_0_20px_#22D3EE]"
+                style={{ maxHeight: "9rem", maxWidth: "9rem" }}
               />
               <span
                 style={{
                   fontFamily: "Amuro, sans-serif",
                   fontWeight: 400,
-                  fontSize: "2.5rem",
+                  fontSize: "2rem",
                   background: "linear-gradient(to right, red, white, blue)",
                   WebkitBackgroundClip: "text",
                   color: "transparent",
                   textShadow: "0 0 10px rgba(0,0,0,0.8)",
                   transition: "text-shadow 0.3s",
                 }}
-                className="group-hover:text-shadow-[0_0_20px_#22D3EE] hidden custom-1300:inline"
+                className="hidden 2xl:inline"
               >
                 G-LAB
               </span>
             </div>
-
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-6 w-full justify-center">
               <nav className="flex items-center gap-6 text-base font-semibold">
                 <MemoGooeyNav pathname={pathname} />
               </nav>
             </div>
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3 ml-auto">
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -127,16 +127,19 @@ function HeaderComponent() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="w-44 bg-gradient-to-br from-purple-100 via-white to-purple-300 border border-purple-300 shadow-xl animate-fade-in"
+                    className="w-44 bg-gradient-to-br from-[#0A92CC]/10 via-white to-[#F4BB19]/20 border border-[#0A92CC] shadow-xl animate-fade-in"
                   >
                     <DropdownMenuItem asChild>
-                      <Link to="/profile" className="w-full">
+                      <Link
+                        to="/profile"
+                        className="w-full text-[#0A92CC] font-semibold"
+                      >
                         Trang cá nhân
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      className="text-red-600"
+                      className="text-[#AE214A] font-bold hover:bg-[#ED2B52]/10"
                       onClick={handleLogout}
                     >
                       Đăng xuất
@@ -146,33 +149,29 @@ function HeaderComponent() {
               ) : (
                 <>
                   <Link to="/auth/register">
-                    <Button className="bg-gradient-to-r from-red-700 via-white to-blue-900 text-black hover:from-red-600 hover:to-blue-700 transition rounded-full px-5 py-2 font-bold shadow-md cursor-pointer hover:scale-105 hover:shadow-lg duration-200">
+                    <Button className="bg-gradient-to-r from-[#F4BB19] via-[#0A92CC] to-[#ED2B52] text-white font-extrabold hover:from-[#F4BB19]/80 hover:to-[#ED2B52]/80 hover:via-[#0A92CC]/80 transition rounded-full px-5 py-2 shadow-lg cursor-pointer hover:scale-105 hover:shadow-[0_0_16px_#0A92CC] duration-200 border-2 border-[#0A92CC]">
                       Đăng ký
                     </Button>
                   </Link>
                   <Link to="/auth/login">
-                    <Button className="border border-blue-900 text-blue-900 bg-white hover:bg-blue-900 hover:text-white transition rounded-full px-5 py-2 font-bold shadow-md cursor-pointer hover:scale-105 hover:shadow-lg duration-200">
+                    <Button className="bg-white text-[#0A92CC] font-extrabold border-2 border-[#0A92CC] hover:bg-[#0A92CC] hover:text-white transition rounded-full px-5 py-2 shadow-lg cursor-pointer hover:scale-105 hover:shadow-[0_0_16px_#0A92CC] duration-200">
                       Đăng nhập
                     </Button>
                   </Link>
                   <button
                     type="button"
                     onClick={scrollToContact}
-                    className="group relative inline-flex items-center justify-center rounded-full bg-red-700 text-white hover: transition-all px-2 py-1 cursor-pointer shadow-md hover:shadow-[0_0_12px_#22D3EE]"
-                    style={{ height: 32, minWidth: 32 }}
+                    className="group relative inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#AE214A] via-[#ED2B52] to-[#F4BB19] text-white font-bold px-3 py-2 cursor-pointer shadow-lg hover:shadow-[0_0_16px_#ED2B52] transition-all duration-200 border-2 border-[#AE214A]"
+                    style={{ height: 38, minWidth: 38 }}
                     aria-label="Hỗ Trợ"
                   >
                     <HelpCircle
-                      size={18}
-                      className="relative z-20 transition-transform duration-300 group-hover:scale-110"
+                      size={20}
+                      className="relative z-20 transition-transform duration-300 group-hover:scale-110 text-[#F4BB19]"
                     />
                     <span
-                      className="absolute left-6 top-1/2 -translate-y-1/2 -translate-x-4 opacity-0
-              group-hover:translate-x-0 group-hover:opacity-100
-              transition-transform duration-500 ease-out
-              text-white bg-red-700 px-3 py-1 rounded-r-full shadow-md whitespace-nowrap
-              z-10 pointer-events-none"
-                      style={{ fontSize: 14 }}
+                      className="absolute left-8 top-1/2 -translate-y-1/2 -translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300 ease-out text-white bg-[#AE214A] px-4 py-1 rounded-r-full shadow-lg whitespace-nowrap z-10 pointer-events-none border border-[#ED2B52]"
+                      style={{ fontSize: 15 }}
                     >
                       Hỗ trợ
                     </span>
