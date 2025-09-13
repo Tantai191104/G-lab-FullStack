@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle, Ban, Eye, MoreHorizontal } from "lucide-react";
+import { PackageCheck, PackageX, Eye, MoreHorizontal } from "lucide-react";
 import type { SwitchItem } from "@/components/types/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,9 +29,10 @@ export function SwitchActions({
   onToggle,
 }: SwitchActionsProps) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingState, setPendingState] = useState(!switchItem.isFalse);
+  const [pendingState, setPendingState] = useState(switchItem.isFalse);
 
   const toggleSwitch = () => {
+    // pendingState = trạng thái mới (ngược với hiện tại)
     setPendingState(!switchItem.isFalse);
     setShowConfirmModal(true);
   };
@@ -42,6 +43,11 @@ export function SwitchActions({
   };
 
   const handleCancelConfirm = () => setShowConfirmModal(false);
+
+  // Label trạng thái hiện tại
+  const currentStatus = switchItem.isFalse ? "Hết hàng" : "Còn hàng";
+  // Label trạng thái mới
+  const nextStatus = !switchItem.isFalse ? "Hết hàng" : "Còn hàng";
 
   return (
     <div className="flex justify-end relative">
@@ -55,22 +61,24 @@ export function SwitchActions({
           align="end"
           className="z-50 bg-white shadow-lg border border-gray-200 rounded-md min-w-[160px]"
         >
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuLabel>Hành động</DropdownMenuLabel>
           <DropdownMenuItem onClick={() => onView(switchItem)}>
             <Eye className="mr-2 h-4 w-4" />
             Xem chi tiết
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            className={switchItem.isFalse ? "text-green-600" : "text-red-600"}
+            className={
+              nextStatus === "Còn hàng" ? "text-green-600" : "text-red-600"
+            }
             onClick={toggleSwitch}
           >
-            {switchItem.isFalse ? (
-              <CheckCircle className="mr-2 h-4 w-4" />
+            {nextStatus === "Còn hàng" ? (
+              <PackageCheck className="mr-2 h-4 w-4" />
             ) : (
-              <Ban className="mr-2 h-4 w-4" />
+              <PackageX className="mr-2 h-4 w-4" />
             )}
-            {switchItem.isFalse ? "Activate" : "Deactivate"}
+            {nextStatus}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -80,24 +88,37 @@ export function SwitchActions({
         open={showConfirmModal}
         onOpenChange={(open) => !open && handleCancelConfirm()}
       >
-        <DialogContent className="max-w-sm bg-white border border-gray-200 shadow-lg">
+        <DialogContent className="max-w-sm bg-white border border-gray-200 shadow-lg rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-red-600 mb-1">
+            <DialogTitle className="text-lg font-semibold text-gray-900">
               Xác nhận thay đổi trạng thái
             </DialogTitle>
           </DialogHeader>
-          <div className="mt-2 text-gray-800">
-            Bạn có chắc chắn muốn{" "}
-            <span className="font-semibold">
-              {pendingState ? "Activate" : "Deactivate"}
-            </span>{" "}
-            cho switch{" "}
+          <div className="mt-3 text-gray-700 leading-relaxed">
+            Sản phẩm{" "}
             <span className="font-semibold text-[#2196f3]">
               {switchItem.name}
+            </span>{" "}
+            hiện tại đang ở trạng thái{" "}
+            <span
+              className={`font-semibold ${
+                currentStatus === "Còn hàng" ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {currentStatus}
+            </span>
+            .<br />
+            Bạn có chắc chắn muốn chuyển sang{" "}
+            <span
+              className={`font-semibold ${
+                nextStatus === "Còn hàng" ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {nextStatus}
             </span>
             ?
           </div>
-          <DialogFooter className="flex justify-end gap-2 mt-4">
+          <DialogFooter className="flex justify-end gap-3 mt-5">
             <Button
               variant="outline"
               onClick={handleCancelConfirm}
@@ -107,7 +128,11 @@ export function SwitchActions({
             </Button>
             <Button
               onClick={handleFinalConfirm}
-              className="bg-red-600 hover:bg-red-700 text-white rounded-lg shadow"
+              className={`rounded-lg shadow ${
+                nextStatus === "Còn hàng"
+                  ? "bg-green-600 hover:bg-green-700 text-white"
+                  : "bg-red-600 hover:bg-red-700 text-white"
+              }`}
             >
               Xác nhận
             </Button>
